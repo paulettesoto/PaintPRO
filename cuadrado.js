@@ -2,10 +2,10 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-// Array para almacenar todas las líneas dibujadas
-var lines = [];
+// Array para almacenar todos los cuadrados dibujados
+var squares = [];
 
-// Función para dibujar la línea con el algoritmo Bresenham
+// Función para dibujar la línea con el algoritmo de Bresenham
 function drawLineBresenham(x0, y0, x1, y1) {
     const dx = Math.abs(x1 - x0);
     const dy = Math.abs(y1 - y0);
@@ -28,6 +28,15 @@ function drawLineBresenham(x0, y0, x1, y1) {
             y += sy;
         }
     }
+}
+
+// Función para dibujar un cuadrado dados sus coordenadas de esquina superior izquierda y tamaño
+function drawSquare(x, y, size) {
+    // Dibujar los cuatro lados del cuadrado
+    drawLineBresenham(x, y, x + size, y);
+    drawLineBresenham(x + size, y, x + size, y + size);
+    drawLineBresenham(x + size, y + size, x, y + size);
+    drawLineBresenham(x, y + size, x, y);
 }
 
 var startX, startY;
@@ -53,13 +62,13 @@ canvas.addEventListener("mousemove", function(event) {
     // Limpiar el lienzo
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Dibujar todas las líneas almacenadas
-    lines.forEach(function(line) {
-        drawLineBresenham(line.startX, line.startY, line.endX, line.endY);
+    // Dibujar todos los cuadrados almacenados
+    squares.forEach(function(square) {
+        drawSquare(square.x, square.y, square.size);
     });
 
-    // Dibujar la línea actual mientras se arrastra el mouse
-    drawLineBresenham(startX, startY, x, y);
+    // Dibujar el cuadrado actual mientras se arrastra el mouse
+    drawSquare(startX, startY, Math.abs(x - startX));
 });
 
 // Manejar evento de mouseup
@@ -70,8 +79,11 @@ canvas.addEventListener("mouseup", function(event) {
     var x = Math.round(event.clientX - rect.left);
     var y = Math.round(event.clientY - rect.top);
 
-    // Almacenar la línea dibujada actualmente
-    lines.push({ startX: startX, startY: startY, endX: x, endY: y });
+    // Calcular el tamaño del cuadrado
+    var size = Math.abs(x - startX);
+
+    // Almacenar el cuadrado dibujado actualmente
+    squares.push({ x: startX, y: startY, size: size });
 
     // Restablecer la bandera de dibujo
     isDrawing = false;

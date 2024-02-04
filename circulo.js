@@ -1,47 +1,89 @@
+// Obtener el lienzo y el contexto
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-function drawCircle(centerX, centerY, radius) {
-    let x = radius;
-    let y = 0;
-    let decisionOver2 = 1 - x;   // Inicialización de la decisión del punto (el primer punto siempre está en el octeto superior derecho)
 
-    while (y <= x) {
-        // Dibuja el pixel en cada octeto
-        drawPixel(centerX + x, centerY - y);
-        drawPixel(centerX - x, centerY - y);
-        drawPixel(centerX + x, centerY + y);
-        drawPixel(centerX - x, centerY + y);
-        drawPixel(centerX + y, centerY - x);
-        drawPixel(centerX - y, centerY - x);
-        drawPixel(centerX + y, centerY + x);
-        drawPixel(centerX - y, centerY + x);
+// Array para almacenar todos los círculos dibujados
+var circles = [];
 
-        y++;
+// Función para dibujar un punto en un octante y reflejarlo en los otros siete octantes
+function drawCirclePoints(x0, y0, x, y) {
+    // Dibujar el punto en el octante
+    ctx.fillRect(x0 + x, y0 + y, 1, 1);
+    // Reflejar en los otros siete octantes
+    ctx.fillRect(x0 + y, y0 + x, 1, 1);
+    ctx.fillRect(x0 + y, y0 - x, 1, 1);
+    ctx.fillRect(x0 + x, y0 - y, 1, 1);
+    ctx.fillRect(x0 - x, y0 - y, 1, 1);
+    ctx.fillRect(x0 - y, y0 - x, 1, 1);
+    ctx.fillRect(x0 - y, y0 + x, 1, 1);
+    ctx.fillRect(x0 - x, y0 + y, 1, 1);
+}
 
-        // Actualiza la decisión según el algoritmo del punto medio
-        if (decisionOver2 <= 0) {
-            decisionOver2 += 2 * y + 1;
+// Función para dibujar un círculo a partir de un octeto (x, y)
+function drawCircleBresenham(x0, y0, radius) {
+    let x = 0;
+    let y = radius;
+    let d = 3 - 2 * radius;
+
+    while (x <= y) {
+        drawCirclePoints(x0, y0, x, y);
+        x++;
+        if (d > 0) {
+            y--;
+            d = d + 4 * (x - y) + 10;
         } else {
-            x--;
-            decisionOver2 += 2 * (y - x) + 1;
+            d = d + 4 * x + 6;
         }
+        drawCirclePoints(x0, y0, x, y);
     }
 }
 
-function drawPixel(x, y) {
-    ctx.fillRect(x, y, 2, 2); // Dibuja el píxel
-}
-canvas.addEventListener("mousedown", function (event) {
-    startX = event.clientX - canvas.getBoundingClientRect().left;
-    startY = event.clientY - canvas.getBoundingClientRect().top;
+var startX, startY;
+var isDrawing = false;
+
+// Manejar evento de mousedown
+canvas.addEventListener("mousedown", function(event) {
+    // Obtener las coordenadas del click
+    var rect = canvas.getBoundingClientRect();
+    startX = Math.round(event.clientX - rect.left);
+    startY = Math.round(event.clientY - rect.top);
+    isDrawing = true;
 });
 
-canvas.addEventListener("mouseup", function (event) {
+// Manejar evento de mousemove
+canvas.addEventListener("mousemove", function(event) {
+    if (!isDrawing) return; // Salir si no estamos dibujando
 
-    var endX = event.clientX - canvas.getBoundingClientRect().left;
-    var endY = event.clientY - canvas.getBoundingClientRect().top;
-    const deltax = Math.abs(endX - startX);
-    const deltay = Math.abs(endY - startY);
-    const radius = Math.sqrt((deltax * deltax) + (deltay * deltay));
-    drawCircle(startX, startY, radius)
+    var rect = canvas.getBoundingClientRect();
+    var x = Math.round(event.clientX - rect.left);
+    var y = Math.round(event.clientY - rect.top);
+
+    // Limpiar el lienzo
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibujar todos los círculos almacenados
+    circles.forEach(function(circle) {
+        drawCircleBresenham(circle.centerX, circle.centerY, circle.radius);
+    });
+
+    // Dibujar el círculo actual mientras se arrastra el mouse
+    drawCircleBresenham(startX, startY, Math.round(Math.sqrt((x - startX) ** 2 + (y - startY) ** 2)));
+});
+
+// Manejar evento de mouseup
+canvas.addEventListener("mouseup", function(event) {
+    if (!isDrawing) return; // Salir si no estamos dibujando
+
+    var rect = canvas.getBoundingClientRect();
+    var x = Math.round(event.clientX - rect.left);
+    var y = Math.round(event.clientY - rect.top);
+
+    // Calcular el radio del círculo
+    var radius = Math.round(Math.sqrt((x - startX) ** 2 + (y - startY) ** 2));
+
+    // Almacenar el círculo dibujado actualmente
+    circles.push({ centerX: startX, centerY: startY, radius: radius });
+
+    // Restablecer la bandera de dibujo
+    isDrawing = false;
 });

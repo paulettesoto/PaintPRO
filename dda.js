@@ -5,20 +5,20 @@ var ctx = canvas.getContext("2d");
 // Array para almacenar todas las líneas dibujadas
 var lines = [];
 
-// Función para dibujar la línea con la fórmula de la pendiente
-function drawLine(x0, y0, x1, y1) {
-    // Calcular la pendiente (m) y la intersección en y (b)
-    var m = (y1 - y0) / (x1 - x0);
-    var b = y0 - m * x0;
+// Función para dibujar la línea con el algoritmo DDA
+function drawLineDDA(x0, y0, x1, y1) {
+    var dx = x1 - x0;
+    var dy = y1 - y0;
+    var steps = Math.max(Math.abs(dx), Math.abs(dy));
+    var xIncrement = dx / steps;
+    var yIncrement = dy / steps;
+    var x = x0;
+    var y = y0;
 
-    // Determinar el inicio y fin de la línea
-    var startX = Math.min(x0, x1);
-    var endX = Math.max(x0, x1);
-
-    // Dibujar la línea pixel por pixel
-    for (var x = startX; x <= endX; x++) {
-        var y = m * x + b;
+    for (var i = 0; i <= steps; i++) {
         ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+        x += xIncrement;
+        y += yIncrement;
     }
 }
 
@@ -47,11 +47,11 @@ canvas.addEventListener("mousemove", function(event) {
 
     // Dibujar todas las líneas almacenadas
     lines.forEach(function(line) {
-        drawLine(line.startX, line.startY, line.endX, line.endY);
+        drawLineDDA(line.startX, line.startY, line.endX, line.endY);
     });
 
     // Dibujar la línea actual mientras se arrastra el mouse
-    drawLine(startX, startY, x, y);
+    drawLineDDA(startX, startY, x, y);
 });
 
 // Manejar evento de mouseup
