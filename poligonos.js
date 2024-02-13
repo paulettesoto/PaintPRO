@@ -6,7 +6,12 @@ var polygons = [];
 
 var isDragging = false;
 var startX, startY, mouseX, mouseY;
-var numSides = 9;
+var numSides = prompt("Numero de lados");
+
+//function updateside(sides) {
+//    numSides = sides;
+//}
+
 var radius = 50;
 var initialAngle = 0; // Ángulo inicial
 

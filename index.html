@@ -11,14 +11,86 @@
             margin: 0;
             width: 100%;
             min-height: 19vh;
+            display: flex;
+        }
+        
+        .icon {
+            margin: 1%;
+            width: 30px;
+            height: 30px;
         }
     </style>
 </head>
 
 <body>
-    <div class="toolbar"></div>
+    <div class="toolbar">
+        <img src="./icons/barra-oblicua.png" class="icon line" onclick="callLineBresenham()">
+        <img src="./icons/cuadrado.png" class="icon square" onclick="callSquare()">
+        <img src="./icons/rectangulo-panoramico.png" class="icon line" onclick="callRect()">
+        <img src="./icons/circulo.png" class="icon line" onclick="callCircle()">
+        <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon line" onclick="callElipse()">
+        <!--<input type="number" value="5" onclick="sides()" onchange="updatesides(this.value)">-->
+        <img src="./icons/hexagono.png" class="icon line" onclick="callPoligone()">
+
+
+    </div>
     <canvas id="canvas" width="1519" height="540" style="border:1px solid black;"></canvas>
-    <script src="poligonos.js"></script>
+    <script>
+        function callLine() {
+            var script = document.createElement('script');
+            script.src = 'linea.js';
+            document.head.appendChild(script);
+        }
+
+        function callLineBresenham() {
+            var script = document.createElement('script');
+            script.src = 'lineaBresenham.js';
+            document.head.appendChild(script);
+        }
+
+        function callLineDDA() {
+            var script = document.createElement('script');
+            script.src = 'dda.js';
+            document.head.appendChild(script);
+        }
+
+        function callSquare() {
+            var script = document.createElement('script');
+            script.src = 'cuadrado.js';
+            document.head.appendChild(script);
+        }
+
+        function callRect() {
+            var script = document.createElement('script');
+            script.src = 'rectangulo.js';
+            document.head.appendChild(script);
+        }
+
+        function callCircle() {
+            var script = document.createElement('script');
+            script.src = 'circulo.js';
+            document.head.appendChild(script);
+        }
+
+        function callElipse() {
+            var script = document.createElement('script');
+            script.src = 'elipse.js';
+            document.head.appendChild(script);
+        }
+
+        function callPoligone() {
+            var script = document.createElement('script');
+            script.src = 'poligonos.js';
+            document.head.appendChild(script);
+        }
+
+        //function sides() {
+        //    var script = document.createElement('script');
+        //    script.src = 'poligonos.js';
+        //    document.head.appendChild(script);
+        //}
+    </script>
+
 </body>
 
 </html>
