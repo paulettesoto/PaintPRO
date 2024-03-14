@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas con Toolbar Modal</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        #toolbar-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        #toolbar-content {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 50px);
+            /* 50px es la altura del toolbar */
+        }
+        
+        #canvas {
+            background-color: white;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #toolbar-button {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toolbar-modal">
+        <div id="toolbar-content">
+            <!-- Agrega aquí tus opciones de toolbar -->
+            <button onclick="toggleToolbarModal()">Cerrar</button>
+        </div>
+    </div>
+    <div id="toolbar-button">
+        <button onclick="toggleToolbarModal()">Toggle Toolbar</button>
+    </div>
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const toolbarModal = document.getElementById('toolbar-modal');
+
+        // Configuración inicial del canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 50; // Restamos la altura del toolbar
+
+        // Dibujar algo en el canvas (puedes añadir tu lógica de dibujo aquí)
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(50, 50, 100, 100);
+
+        // Función para cambiar la visibilidad del toolbar modal
+        function toggleToolbarModal() {
+            toolbarModal.style.display = (toolbarModal.style.display === 'none') ? 'block' : 'none';
+        }
+
+        // Función para cambiar el tamaño del canvas cuando se redimensiona la ventana
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - 50; // Restamos la altura del toolbar
+        }
+
+        // Escuchar cambios en el tamaño de la ventana
+        window.addEventListener('resize', resizeCanvas);
+    </script>
+</body>
+
+</html>

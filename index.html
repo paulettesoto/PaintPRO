@@ -9,9 +9,44 @@
         .toolbar {
             background-color: rgb(199, 198, 198);
             margin: 0;
+            padding-top: 1%;
             width: 100%;
             min-height: 19vh;
             display: flex;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .selection {
+            margin: 0 2% 0 1%;
+        }
+        
+        .image {
+            margin: 0 2% 0 1%;
+        }
+        
+        .tools {
+            margin: 0 2% 0 1%;
+        }
+        
+        .pen {
+            margin: 0 2% 0 1%;
+        }
+        
+        .shapes {
+            margin: 0 2% 0 1%;
+        }
+        
+        .size {
+            margin: 0 2% 0 1%;
+        }
+        
+        .colors {
+            margin: 0 2% 0 1%;
+        }
+        
+        .layers {
+            margin: 0 2% 0 1%;
         }
         
         .icon {
@@ -25,16 +60,51 @@
 
 <body>
     <div class="toolbar">
-        <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
-        <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
-        <img src="./icons/rectangulo-panoramico.png" class="icon line" data-value="rectangulo">
-        <img src="./icons/circulo.png" class="icon line" data-value="circulo">
-        <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon line" data-value="elipse">
-        <!--<input type="number" value="5" onclick="sides()" onchange="updatesides(this.value)">-->
-        <img src="./icons/hexagono.png" class="icon line" data-value="poligono">
+        <div class="selection">
+
+            <br> Selección
+        </div>
+        <div class="image">
+
+            <br> Imagen
+        </div>
+        <div class="tools">
+            <img src="./icons/lapiz.png" class="icon lapiz" data-value="lapiz">
+            <br> Herramientas
+        </div>
+        <div class="pen">
+            <br> Pinceles
+        </div>
+        <div class="shapes">
+            <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
+            <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
+            <img src="./icons/rectangulo-panoramico.png" class="icon line" data-value="rectangulo">
+            <img src="./icons/circulo.png" class="icon line" data-value="circulo">
+            <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon line" data-value="elipse">
+            <img src="./icons/hexagono.png" class="icon line" data-value="poligono">
+            <br> Formas
+        </div>
+        <div class="size">
+            <br> Tamaño
+        </div>
+        <div class="colors">
+            <br> Colores
+        </div>
+        <div class="layers">
+            <br> Capas
+        </div>
+
     </div>
-    <canvas id="canvas" width="1519" height="540" style="border:1px solid black;"></canvas>
+    <canvas id="canvas" width="1500" height="540" style="border:1px solid black;"></canvas>
     <script type="module" src="objeto.js"></script>
+    <script>
+        function callLine() {
+            var script = document.createElement('script');
+            script.src = 'lapiz.js';
+            document.head.appendChild(script);
+        }
+    </script>
+
 
 </body>
 

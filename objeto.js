@@ -11,6 +11,9 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var formasDibujadas = [];
 
+// Array para almacenar los puntos dibujados
+let drawingPoints = [];
+
 // Manejar eventos de dibujo (mousedown, mousemove, mouseup)
 var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle;
 var isDrawing = false;
@@ -26,6 +29,14 @@ canvas.addEventListener("mousedown", function(event) {
         mouseX = startX;
         mouseY = startY;
         initialAngle = 0;
+    } else if (figura === "lapiz") {
+        drawingPoints = []; // Limpiar los puntos dibujados
+
+        var x = event.clientX - canvas.offsetLeft;
+        var y = event.clientY - canvas.offsetTop;
+
+        drawingPoints.push({ x, y });
+
     } else {
         startX = Math.round(event.clientX - rect.left);
         startY = Math.round(event.clientY - rect.top);
@@ -36,10 +47,21 @@ canvas.addEventListener("mousedown", function(event) {
 
 canvas.addEventListener("mousemove", function(event) {
     if (!isDrawing) return;
+    var x, y;
 
     var rect = canvas.getBoundingClientRect();
-    var x = Math.round(event.clientX - rect.left);
-    var y = Math.round(event.clientY - rect.top);
+
+    if (figura === "lapiz") {
+
+        x = event.clientX - canvas.offsetLeft;
+        y = event.clientY - canvas.offsetTop;
+
+        drawingPoints.push({ x, y });
+
+    } else {
+        x = Math.round(event.clientX - rect.left);
+        y = Math.round(event.clientY - rect.top);
+    }
 
     // Limpiar el lienzo
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -57,6 +79,16 @@ canvas.addEventListener("mousemove", function(event) {
             drawEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b);
         } else if (forma.tipo === "poligono") {
             drawPolygon(ctx, forma.numSides, forma.radiusP, forma.startX, forma.startY, forma.initialAngle);
+        } else if (forma.tipo === "lapiz") {
+
+            for (let i = 1; i < forma.points.length; i++) {
+
+                const startPoint = forma.points[i - 1];
+                const endPoint = forma.points[i];
+
+                drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+
+            }
         }
     });
 
@@ -78,6 +110,18 @@ canvas.addEventListener("mousemove", function(event) {
             radiusP = Math.sqrt(Math.pow(mouseX - startX, 2) + Math.pow(mouseY - startY, 2));
             initialAngle = Math.atan2(mouseY - startY, mouseX - startX);
             drawPolygon(ctx, numSides, radiusP, startX, startY, initialAngle);
+        } else if (figura === "lapiz") {
+
+            for (let i = 1; i < drawingPoints.length; i++) {
+
+                const startPoint = drawingPoints[i - 1];
+                const endPoint = drawingPoints[i];
+                console.log(startPoint, endPoint);
+
+                console.log(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+                drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+
+            }
         }
     }
 });
@@ -98,6 +142,9 @@ canvas.addEventListener("mouseup", function(event) {
     // Calcular los semiejes de la elipse
     var a = Math.abs(x - startX);
     var b = Math.abs(y - startY);
+    // Hacer una copia de los puntos dibujados  
+
+    var points = drawingPoints.slice();
 
     var forma = {
         tipo: figura,
@@ -113,7 +160,8 @@ canvas.addEventListener("mouseup", function(event) {
         b: b,
         numSides: numSides,
         radiusP: radiusP,
-        initialAngle: initialAngle
+        initialAngle: initialAngle,
+        points: points
     };
 
     // Almacenar la forma dibujada actualmente
