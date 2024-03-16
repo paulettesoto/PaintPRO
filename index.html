@@ -83,13 +83,14 @@
             <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon ellipse" data-value="elipse">
             <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
             <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
-            <img src="./icons/trapecio.png" class="icon trapecio" onclick="callLine()">
+            <img src="./icons/trapecio.png" class="icon trapecio" data-value="trapecio">
             <br> Formas
         </div>
         <div class="size">
             <br> Tamaño
         </div>
         <div class="colors">
+            <input type="color" value="#000000" id="colorPicker" name="colorPicker">
             <br> Colores
         </div>
         <div class="layers">
@@ -102,7 +103,7 @@
     <script>
         function callLine() {
             var script = document.createElement('script');
-            script.src = 'trapecio.js';
+            script.src = 'trapecio2.js';
             document.head.appendChild(script);
         }
     </script>

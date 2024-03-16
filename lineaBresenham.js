@@ -7,9 +7,8 @@ export function drawLineBresenham(ctx, x0, y0, x1, y1) {
     let err = dx - dy;
     let x = x0;
     let y = y0;
-
     while (true) {
-        ctx.fillRect(x, y, 1, 1); // Dibuja el píxel
+        drawPixel(ctx, x, y)
         if (x === x1 && y === y1) break;
         let e2 = 2 * err;
         if (e2 > -dy) {
@@ -21,4 +20,13 @@ export function drawLineBresenham(ctx, x0, y0, x1, y1) {
             y += sy;
         }
     }
+}
+
+export function drawPixel(ctx, x, y) {
+
+    ctx.fillRect(x, y, 1, 1); // Dibuja el píxel    
+}
+
+export function setColor(ctx, color) {
+    ctx.fillStyle = color;
 }

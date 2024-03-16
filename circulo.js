@@ -1,7 +1,3 @@
-// Obtener el lienzo y el contexto
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-
 // Función para dibujar un punto en un octante y reflejarlo en los otros siete octantes
 function drawCirclePoints(ctx, x0, y0, x, y) {
     // Dibujar el punto en el octante

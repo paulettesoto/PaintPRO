@@ -1,11 +1,12 @@
 // Importar las funciones necesarias de cada módulo
-import { drawLineBresenham } from './lineaBresenham.js';
+import { drawLineBresenham, setColor } from './lineaBresenham.js';
 import { drawSquare } from './cuadrado.js';
 import { drawCircleBresenham } from './circulo.js';
 import { drawRectangle } from './rectangulo.js';
 import { drawEllipse } from './elipse.js';
 import { drawPolygon } from './poligonos.js';
 import { drawRhombus } from './rombo.js';
+import { drawTrapezoid } from './trapecio.js';
 
 // Obtener el lienzo y el contexto
 var canvas = document.getElementById("canvas");
@@ -16,11 +17,12 @@ var formasDibujadas = [];
 let drawingPoints = [];
 
 // Manejar eventos de dibujo (mousedown, mousemove, mouseup)
-var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle;
+var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle, selectedColor;
 var isDrawing = false;
 var numSides = 7;
 initialAngle = 0;
 radiusP = 50;
+
 canvas.addEventListener("mousedown", function(event) {
     // Obtener las coordenadas del click
     var rect = canvas.getBoundingClientRect();
@@ -68,7 +70,10 @@ canvas.addEventListener("mousemove", function(event) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // Dibujar todas las figuras almacenadas
     formasDibujadas.forEach(function(forma) {
+        console.log(forma.tipo, forma.color);
+        setColor(ctx, forma.color);
         if (forma.tipo === "linea") {
+
             drawLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY);
         } else if (forma.tipo === "cuadrado") {
             drawSquare(ctx, forma.startX, forma.startY, forma.size);
@@ -92,10 +97,14 @@ canvas.addEventListener("mousemove", function(event) {
             }
         } else if (forma.tipo === "rombo") {
             drawRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY);
+        } else if (forma.tipo === "trapecio") {
+            drawTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY);
         }
     });
 
     if (isDrawing) {
+        console.log("nuevo: ", selectedColor);
+        setColor(ctx, selectedColor);
 
         if (figura === "linea") {
             drawLineBresenham(ctx, startX, startY, x, y);
@@ -127,6 +136,8 @@ canvas.addEventListener("mousemove", function(event) {
             }
         } else if (figura === "rombo") {
             drawRhombus(ctx, startX, startY, x, y);
+        } else if (figura === "trapecio") {
+            drawTrapezoid(ctx, startX, startY, x, y);
         }
     }
 });
@@ -168,7 +179,8 @@ canvas.addEventListener("mouseup", function(event) {
         numSides: numSides,
         radiusP: radiusP,
         initialAngle: initialAngle,
-        points: points
+        points: points,
+        color: selectedColor
     };
 
     // Almacenar la forma dibujada actualmente
@@ -187,4 +199,12 @@ imagenes.forEach(function(img) {
         console.log(figura)
 
     });
+});
+
+// Obtener el elemento input de color
+const colorPicker = document.getElementById('colorPicker');
+
+// Escuchar cambios en el color seleccionado
+colorPicker.addEventListener('change', function() {
+    selectedColor = colorPicker.value;
 });
