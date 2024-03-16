@@ -83,6 +83,7 @@
             <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon ellipse" data-value="elipse">
             <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
             <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
+            <img src="./icons/trapecio.png" class="icon trapecio" onclick="callLine()">
             <br> Formas
         </div>
         <div class="size">
@@ -101,7 +102,7 @@
     <script>
         function callLine() {
             var script = document.createElement('script');
-            script.src = 'rombo2.js';
+            script.src = 'trapecio.js';
             document.head.appendChild(script);
         }
     </script>

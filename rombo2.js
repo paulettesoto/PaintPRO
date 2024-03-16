@@ -31,7 +31,7 @@ canvas.addEventListener("mousemove", function(event) {
     // Dibujar todos los rombos almacenados
     rhombuses.forEach(function(rhombus) {
         console.log("anterior", rhombus.centerX, rhombus.centerY, rhombus.width, rhombus.height);
-        drawRhombus(rhombus.centerX, rhombus.centerY, rhombus.width, rhombus.height);
+        drawRhombus(rhombus.centerX, rhombus.centerY, rhombus.endX, rhombus.endY);
     });
 
     // Dibujar el rombo actual mientras se arrastra el mouse
@@ -49,7 +49,7 @@ canvas.addEventListener("mouseup", function(event) {
 
     // Almacenar el rombo dibujado actualmente
     console.log("push", startX, startY, x, y);
-    rhombuses.push({ centerX: startX, centerY: startY, width: x, height: y });
+    rhombuses.push({ centerX: startX, centerY: startY, endX: x, endY: y });
 
     // Restablecer la bandera de dibujo
     isDrawing = false;
@@ -73,7 +73,7 @@ function drawRhombus(centerX, centerY, mouseX, mouseY) {
     }
 }
 
-// Función para dibujar una línea entre dos puntos usando Bresenham's line algorithm
+// Función para dibujar una línea entre dos puntos usando Bresenham
 function drawLineBresenham(ctx, x0, y0, x1, y1) {
     const dx = Math.abs(x1 - x0);
     const dy = Math.abs(y1 - y0);
