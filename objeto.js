@@ -103,7 +103,6 @@ canvas.addEventListener("mousemove", function(event) {
     });
 
     if (isDrawing) {
-        console.log("nuevo: ", selectedColor);
         setColor(ctx, selectedColor);
 
         if (figura === "linea") {
@@ -197,6 +196,12 @@ imagenes.forEach(function(img) {
         // Obtener el valor del atributo data-value de la imagen
         figura = this.getAttribute('data-value');
         console.log(figura)
+        if (figura === "seleccion") {
+            canvas.addEventListener("click", detectarFiguraSeleccionada);
+        } else {
+            // Si no es "seleccion", eliminar el evento para detectar la figura seleccionada
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
+        }
 
     });
 });
@@ -208,3 +213,62 @@ const colorPicker = document.getElementById('colorPicker');
 colorPicker.addEventListener('change', function() {
     selectedColor = colorPicker.value;
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    selectedColor = colorPicker.value;
+});
+
+function detectarFiguraSeleccionada(event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = Math.round(event.clientX - rect.left);
+    var y = Math.round(event.clientY - rect.top);
+
+    // Iterar sobre las formas dibujadas y verificar si el punto (x, y) está dentro de alguna forma
+    for (var i = formasDibujadas.length - 1; i >= 0; i--) {
+        var forma = formasDibujadas[i];
+        if (forma.tipo === "linea") {
+
+            if (x >= forma.startX && x <= forma.endX && y >= forma.startY && y <= forma.endY) {
+                console.log("Línea seleccionada");
+                break;
+            }
+        } else if (forma.tipo === "cuadrado") {
+
+            if (x >= forma.startX && x <= forma.startX + forma.size && y >= forma.startY && y <= forma.startY + forma.size) {
+                console.log("Cuadrado seleccionado");
+                break;
+            }
+        } else if (forma.tipo === "circulo") {
+            var distanciaCentro = Math.sqrt((x - forma.startX) ** 2 + (y - forma.startY) ** 2);
+            if (distanciaCentro <= forma.radius) {
+                console.log("Círculo seleccionado");
+                break;
+            }
+        } else if (forma.tipo === "rectangulo") {
+            if (x >= forma.startX && x <= forma.startX + forma.width && y >= forma.startY && y <= forma.startY + forma.height) {
+                console.log("Rectángulo seleccionado");
+                break;
+            }
+        } else if (forma.tipo === "elipse") {
+            var rx = forma.a / 2; // Semieje mayor
+            var ry = forma.b / 2; // Semieje menor
+            var centroX = forma.startX + rx;
+            var centroY = forma.startY + ry;
+            if ((((x - centroX) ** 2) / (rx ** 2)) + (((y - centroY) ** 2) / (ry ** 2)) <= 1) {
+                console.log("Elipse seleccionada");
+                break;
+            }
+        } else if (forma.tipo === "poligono") {
+
+            console.log("Polígono seleccionado");
+            break;
+        } else if (forma.tipo === "rombo") {
+            console.log("Rombo seleccionado");
+            break;
+        } else if (forma.tipo === "trapecio") {
+            console.log("Trapecio seleccionado");
+            break;
+        }
+
+    }
+}
