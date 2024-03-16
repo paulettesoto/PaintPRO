@@ -5,6 +5,7 @@ import { drawCircleBresenham } from './circulo.js';
 import { drawRectangle } from './rectangulo.js';
 import { drawEllipse } from './elipse.js';
 import { drawPolygon } from './poligonos.js';
+import { drawRhombus } from './rombo.js';
 
 // Obtener el lienzo y el contexto
 var canvas = document.getElementById("canvas");
@@ -89,6 +90,8 @@ canvas.addEventListener("mousemove", function(event) {
                 drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
 
             }
+        } else if (forma.tipo === "rombo") {
+            drawRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY);
         }
     });
 
@@ -122,6 +125,8 @@ canvas.addEventListener("mousemove", function(event) {
                 drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
 
             }
+        } else if (figura === "rombo") {
+            drawRhombus(ctx, startX, startY, x, y);
         }
     }
 });
@@ -130,8 +135,10 @@ canvas.addEventListener("mouseup", function(event) {
     if (!isDrawing) return;
 
     var rect = canvas.getBoundingClientRect();
+
     var x = Math.round(event.clientX - rect.left);
     var y = Math.round(event.clientY - rect.top);
+
     //Tamaño cuadrado
     var size = Math.abs(x - startX);
     //Radio del circulo

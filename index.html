@@ -51,8 +51,8 @@
         
         .icon {
             margin: 1%;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
         }
     </style>
 </head>
@@ -69,7 +69,7 @@
             <br> Imagen
         </div>
         <div class="tools">
-            <img src="./icons/lapiz.png" class="icon lapiz" data-value="lapiz">
+            <img src="./icons/lapiz (1).png" class="icon lapiz" data-value="lapiz">
             <br> Herramientas
         </div>
         <div class="pen">
@@ -78,10 +78,11 @@
         <div class="shapes">
             <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
             <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
-            <img src="./icons/rectangulo-panoramico.png" class="icon line" data-value="rectangulo">
-            <img src="./icons/circulo.png" class="icon line" data-value="circulo">
-            <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon line" data-value="elipse">
-            <img src="./icons/hexagono.png" class="icon line" data-value="poligono">
+            <img src="./icons/rectangulo-panoramico.png" class="icon rect" data-value="rectangulo">
+            <img src="./icons/circulo.png" class="icon circle" data-value="circulo">
+            <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon ellipse" data-value="elipse">
+            <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
+            <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
             <br> Formas
         </div>
         <div class="size">
@@ -100,7 +101,7 @@
     <script>
         function callLine() {
             var script = document.createElement('script');
-            script.src = 'lapiz.js';
+            script.src = 'rombo2.js';
             document.head.appendChild(script);
         }
     </script>

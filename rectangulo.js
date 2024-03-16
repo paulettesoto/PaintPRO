@@ -1,7 +1,3 @@
-// Obtener el lienzo y el contexto
-var canvas = document.getElementById("canvas");
-
-
 // Función para dibujar la línea con el algoritmo de Bresenham
 function drawLineBresenham(ctx, x0, y0, x1, y1) {
     const dx = Math.abs(x1 - x0);
