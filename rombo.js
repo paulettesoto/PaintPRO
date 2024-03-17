@@ -1,7 +1,7 @@
-import { drawLineBresenham } from './lineaBresenham.js';
+import { drawLineBresenham, selectedLineBresenham } from './lineaBresenham.js';
 
 // Función para dibujar un rombo a partir de su centro y dimensiones
-export function drawRhombus(ctx, centerX, centerY, mouseX, mouseY) {
+export function drawRhombus(ctx, centerX, centerY, mouseX, mouseY, stroke) {
     // Calcular los vértices del rombo
     var vertices = [
         { x: centerX, y: centerY - Math.abs(mouseY - centerY) }, // Punto superior
@@ -14,6 +14,26 @@ export function drawRhombus(ctx, centerX, centerY, mouseX, mouseY) {
     for (var i = 0; i < vertices.length; i++) {
         var startPoint = vertices[i];
         var endPoint = vertices[(i + 1) % vertices.length];
-        drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, stroke);
+    }
+}
+// Función para dibujar un rombo a partir de su centro y dimensiones
+export function selectedRhombus(ctx, centerX, centerY, mouseX, mouseY, stroke, px, py) {
+    // Calcular los vértices del rombo
+    var vertices = [
+        { x: centerX, y: centerY - Math.abs(mouseY - centerY) }, // Punto superior
+        { x: centerX + Math.abs(mouseX - centerX), y: centerY }, // Punto derecho
+        { x: centerX, y: centerY + Math.abs(mouseY - centerY) }, // Punto inferior
+        { x: centerX - Math.abs(mouseX - centerX), y: centerY } // Punto izquierdo
+    ];
+
+    // Dibujar el rombo pixel por pixel
+    for (var i = 0; i < vertices.length; i++) {
+        var startPoint = vertices[i];
+        var endPoint = vertices[(i + 1) % vertices.length];
+        if (selectedLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, stroke, px, py)) {
+            //console.log("Rombo seleccionado")
+            return true;
+        }
     }
 }

@@ -1,12 +1,12 @@
 // Importar las funciones necesarias de cada módulo
-import { drawLineBresenham, setColor } from './lineaBresenham.js';
-import { drawSquare } from './cuadrado.js';
-import { drawCircleBresenham } from './circulo.js';
-import { drawRectangle } from './rectangulo.js';
-import { drawEllipse } from './elipse.js';
-import { drawPolygon } from './poligonos.js';
-import { drawRhombus } from './rombo.js';
-import { drawTrapezoid } from './trapecio.js';
+import { drawLineBresenham, setColor, selectedLineBresenham } from './lineaBresenham.js';
+import { drawSquare, selectedSquare } from './cuadrado.js';
+import { drawCircleBresenham, selectedCircleBresenham } from './circulo.js';
+import { drawRectangle, selectedRectangle } from './rectangulo.js';
+import { drawEllipse, selectedEllipse } from './elipse.js';
+import { drawPolygon, selectedPolygon } from './poligonos.js';
+import { drawRhombus, selectedRhombus } from './rombo.js';
+import { drawTrapezoid, selectedTrapezoid } from './trapecio.js';
 
 // Obtener el lienzo y el contexto
 var canvas = document.getElementById("canvas");
@@ -17,7 +17,7 @@ var formasDibujadas = [];
 let drawingPoints = [];
 
 // Manejar eventos de dibujo (mousedown, mousemove, mouseup)
-var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle, selectedColor;
+var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle, selectedColor, stroke;
 var isDrawing = false;
 var numSides = 7;
 initialAngle = 0;
@@ -70,73 +70,44 @@ canvas.addEventListener("mousemove", function(event) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // Dibujar todas las figuras almacenadas
     formasDibujadas.forEach(function(forma) {
-        console.log(forma.tipo, forma.color);
-        setColor(ctx, forma.color);
-        if (forma.tipo === "linea") {
-
-            drawLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY);
-        } else if (forma.tipo === "cuadrado") {
-            drawSquare(ctx, forma.startX, forma.startY, forma.size);
-        } else if (forma.tipo === "circulo") {
-            drawCircleBresenham(ctx, forma.startX, forma.startY, forma.radius);
-        } else if (forma.tipo === "rectangulo") {
-            drawRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height);
-        } else if (forma.tipo === "elipse") {
-            drawEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b);
-        } else if (forma.tipo === "poligono") {
-            drawPolygon(ctx, forma.numSides, forma.radiusP, forma.startX, forma.startY, forma.initialAngle);
-        } else if (forma.tipo === "lapiz") {
-
-            for (let i = 1; i < forma.points.length; i++) {
-
-                const startPoint = forma.points[i - 1];
-                const endPoint = forma.points[i];
-
-                drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-
-            }
-        } else if (forma.tipo === "rombo") {
-            drawRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY);
-        } else if (forma.tipo === "trapecio") {
-            drawTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY);
-        }
+        drawAll(forma);
     });
 
     if (isDrawing) {
         setColor(ctx, selectedColor);
 
         if (figura === "linea") {
-            drawLineBresenham(ctx, startX, startY, x, y);
+            drawLineBresenham(ctx, startX, startY, x, y, stroke);
         } else if (figura === "cuadrado") {
-            drawSquare(ctx, startX, startY, Math.abs(x - startX));
+            drawSquare(ctx, startX, startY, Math.abs(x - startX), stroke);
         } else if (figura === "circulo") {
-            drawCircleBresenham(ctx, startX, startY, Math.round(Math.sqrt((x - startX) ** 2 + (y - startY) ** 2)));
+            drawCircleBresenham(ctx, startX, startY, Math.round(Math.sqrt((x - startX) ** 2 + (y - startY) ** 2)), stroke);
         } else if (figura === "rectangulo") {
-            drawRectangle(ctx, startX, startY, x - startX, y - startY);
+            drawRectangle(ctx, startX, startY, x - startX, y - startY, stroke);
         } else if (figura === "elipse") {
-            drawEllipse(ctx, startX, startY, Math.abs(x - startX), Math.abs(y - startY));
+            drawEllipse(ctx, startX, startY, Math.abs(x - startX), Math.abs(y - startY), stroke);
         } else if (figura === "poligono") {
             mouseX = event.offsetX;
             mouseY = event.offsetY;
             radiusP = Math.sqrt(Math.pow(mouseX - startX, 2) + Math.pow(mouseY - startY, 2));
             initialAngle = Math.atan2(mouseY - startY, mouseX - startX);
-            drawPolygon(ctx, numSides, radiusP, startX, startY, initialAngle);
+            drawPolygon(ctx, numSides, radiusP, startX, startY, initialAngle, stroke);
         } else if (figura === "lapiz") {
 
             for (let i = 1; i < drawingPoints.length; i++) {
 
                 const startPoint = drawingPoints[i - 1];
                 const endPoint = drawingPoints[i];
-                console.log(startPoint, endPoint);
+                //console.log(startPoint, endPoint);
 
-                console.log(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-                drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+                //console.log(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+                drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, stroke);
 
             }
         } else if (figura === "rombo") {
-            drawRhombus(ctx, startX, startY, x, y);
+            drawRhombus(ctx, startX, startY, x, y, stroke);
         } else if (figura === "trapecio") {
-            drawTrapezoid(ctx, startX, startY, x, y);
+            drawTrapezoid(ctx, startX, startY, x, y, stroke);
         }
     }
 });
@@ -179,7 +150,8 @@ canvas.addEventListener("mouseup", function(event) {
         radiusP: radiusP,
         initialAngle: initialAngle,
         points: points,
-        color: selectedColor
+        color: selectedColor,
+        stroke: stroke
     };
 
     // Almacenar la forma dibujada actualmente
@@ -187,6 +159,38 @@ canvas.addEventListener("mouseup", function(event) {
 
     isDrawing = false;
 });
+
+function drawAll(forma) {
+    //console.log(forma.tipo, forma.color);
+    setColor(ctx, forma.color);
+    if (forma.tipo === "linea") {
+        drawLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke);
+    } else if (forma.tipo === "cuadrado") {
+        drawSquare(ctx, forma.startX, forma.startY, forma.size, forma.stroke);
+    } else if (forma.tipo === "circulo") {
+        drawCircleBresenham(ctx, forma.startX, forma.startY, forma.radius, forma.stroke);
+    } else if (forma.tipo === "rectangulo") {
+        drawRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke);
+    } else if (forma.tipo === "elipse") {
+        drawEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b, forma.stroke);
+    } else if (forma.tipo === "poligono") {
+        drawPolygon(ctx, forma.numSides, forma.radiusP, forma.startX, forma.startY, forma.initialAngle, forma.stroke);
+    } else if (forma.tipo === "lapiz") {
+
+        for (let i = 1; i < forma.points.length; i++) {
+
+            const startPoint = forma.points[i - 1];
+            const endPoint = forma.points[i];
+
+            drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, forma.stroke);
+
+        }
+    } else if (forma.tipo === "rombo") {
+        drawRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke);
+    } else if (forma.tipo === "trapecio") {
+        drawTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke);
+    }
+}
 
 const imagenes = document.querySelectorAll('.icon');
 
@@ -198,6 +202,8 @@ imagenes.forEach(function(img) {
         console.log(figura)
         if (figura === "seleccion") {
             canvas.addEventListener("click", detectarFiguraSeleccionada);
+        } else if (figura == "png") {
+            downloadPNG();
         } else {
             // Si no es "seleccion", eliminar el evento para detectar la figura seleccionada
             canvas.removeEventListener("click", detectarFiguraSeleccionada);
@@ -218,6 +224,21 @@ document.addEventListener('DOMContentLoaded', function() {
     selectedColor = colorPicker.value;
 });
 
+// Obtener el elemento select tamaño
+const selectSize = document.getElementById('stroke');
+
+// Escuchar cambios
+selectSize.addEventListener('change', function() {
+    stroke = parseInt(selectSize.value);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    stroke = parseInt(selectSize.value);
+});
+
+let figuraSeleccionada = null;
+let indiceFiguraSeleccionada = -1;
+
 function detectarFiguraSeleccionada(event) {
     var rect = canvas.getBoundingClientRect();
     var x = Math.round(event.clientX - rect.left);
@@ -228,47 +249,247 @@ function detectarFiguraSeleccionada(event) {
         var forma = formasDibujadas[i];
         if (forma.tipo === "linea") {
 
-            if (x >= forma.startX && x <= forma.endX && y >= forma.startY && y <= forma.endY) {
-                console.log("Línea seleccionada");
-                break;
+            //console.log(selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y));
+            if (selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
+                console.log("Linea seleccionada");
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
             }
+
         } else if (forma.tipo === "cuadrado") {
 
-            if (x >= forma.startX && x <= forma.startX + forma.size && y >= forma.startY && y <= forma.startY + forma.size) {
-                console.log("Cuadrado seleccionado");
-                break;
+            if (selectedSquare(ctx, forma.startX, forma.startY, forma.size, forma.stroke, x, y)) {
+                console.log("Cuadrado seleccionada");
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
             }
+
         } else if (forma.tipo === "circulo") {
-            var distanciaCentro = Math.sqrt((x - forma.startX) ** 2 + (y - forma.startY) ** 2);
-            if (distanciaCentro <= forma.radius) {
-                console.log("Círculo seleccionado");
-                break;
+
+            if (selectedCircleBresenham(ctx, forma.startX, forma.startY, forma.radius, forma.stroke, x, y)) {
+                console.log("Circulo seleccionada");
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
             }
+
         } else if (forma.tipo === "rectangulo") {
-            if (x >= forma.startX && x <= forma.startX + forma.width && y >= forma.startY && y <= forma.startY + forma.height) {
-                console.log("Rectángulo seleccionado");
-                break;
+
+            if (selectedRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke, x, y)) {
+                console.log("Rectangulo seleccionada");
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
             }
+
         } else if (forma.tipo === "elipse") {
-            var rx = forma.a / 2; // Semieje mayor
-            var ry = forma.b / 2; // Semieje menor
-            var centroX = forma.startX + rx;
-            var centroY = forma.startY + ry;
-            if ((((x - centroX) ** 2) / (rx ** 2)) + (((y - centroY) ** 2) / (ry ** 2)) <= 1) {
+
+            if (selectedEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b, forma.stroke, x, y)) {
                 console.log("Elipse seleccionada");
-                break;
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
             }
+
         } else if (forma.tipo === "poligono") {
 
-            console.log("Polígono seleccionado");
-            break;
-        } else if (forma.tipo === "rombo") {
-            console.log("Rombo seleccionado");
-            break;
-        } else if (forma.tipo === "trapecio") {
-            console.log("Trapecio seleccionado");
-            break;
-        }
+            if (selectedPolygon(ctx, forma.numSides, forma.radiusP, forma.startX, forma.startY, forma.initialAngle, forma.stroke, x, y)) {
+                console.log("Poligono seleccionada");
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
+            }
 
+            //} else if (forma.tipo === "lapiz") {
+
+
+            //    for (let j = 1; j < forma.points.length; j++) {
+
+
+            //        const startPoint = forma.points[j - 1];
+            //        const endPoint = forma.points[j];
+
+            //        if (selectedLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, forma.stroke, x, y)) {
+            //            console.log("Mano alzada seleccionada");
+            //            figuraSeleccionada = forma;
+            //            console.log(figuraSeleccionada);
+            //            indiceFiguraSeleccionada = i;
+            //            return
+            //        }
+
+
+            //    }
+
+        } else if (forma.tipo === "rombo") {
+
+            if (selectedRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
+                console.log("Rombo seleccionada");
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
+            }
+
+        } else if (forma.tipo === "trapecio") {
+
+            if (selectedTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
+                console.log("Linea seleccionada");
+                figuraSeleccionada = forma;
+                indiceFiguraSeleccionada = i;
+                return
+            }
+
+        } else {
+            figuraSeleccionada = null;
+
+        }
     }
 }
+
+canvas.addEventListener("mousedown", function(event) {
+    if (figuraSeleccionada !== null) {
+        canvas.addEventListener("mousemove", moverFigura);
+        canvas.style.cursor = "move";
+    } else {
+        return
+    }
+});
+
+function moverFigura(event) {
+    const rect = canvas.getBoundingClientRect();
+    var x, y;
+    if (figuraSeleccionada.tipo === "poligono") {
+        x = event.offsetX;
+        y = event.offsetY;
+        mouseX = startX;
+        mouseY = startY;
+        //} else if (figuraSeleccionada.tipo === "lapiz") {
+        //    drawingPoints = []; // Limpiar los puntos dibujados
+        //    x = event.clientX - canvas.offsetLeft;
+        //    y = event.clientY - canvas.offsetTop;
+
+        //    drawingPoints.push({ x, y });
+
+    } else {
+        x = Math.round(event.clientX - rect.left);
+        y = Math.round(event.clientY - rect.top);
+    }
+
+
+    // Calcular la diferencia entre la posición actual y la posición anterior
+    const diffX = x - figuraSeleccionada.startX;
+    const diffY = y - figuraSeleccionada.startY;
+
+    // Actualizar la posición de la figura seleccionada
+    figuraSeleccionada.startX = x;
+    figuraSeleccionada.startY = y;
+    figuraSeleccionada.endX += diffX; // Actualizar endX según la diferencia en x
+    figuraSeleccionada.endY += diffY; // Actualizar endY según la diferencia en y
+
+    // Limpiar el lienzo y dibujar todas las figuras actualizadas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    formasDibujadas.forEach(function(forma, index) {
+        // Dibujar todas las figuras excepto la figura seleccionada
+        if (index !== indiceFiguraSeleccionada) {
+            drawAll(forma);
+        }
+    });
+
+    // Dibujar la figura seleccionada en su nueva posición
+    const figura = formasDibujadas[indiceFiguraSeleccionada];
+    //console.log(figura);
+    setColor(ctx, '#ff0000');
+    if (figura.tipo === "linea") {
+        drawLineBresenham(ctx, figura.startX, figura.startY, figura.endX, figura.endY, figura.stroke);
+    } else if (figura.tipo === "cuadrado") {
+        drawSquare(ctx, figura.startX, figura.startY, figura.size, figura.stroke);
+    } else if (figura.tipo === "circulo") {
+        drawCircleBresenham(ctx, figura.startX, figura.startY, figura.radius, figura.stroke);
+    } else if (figura.tipo === "rectangulo") {
+        drawRectangle(ctx, figura.startX, figura.startY, figura.width, figura.height, figura.stroke);
+    } else if (figura.tipo === "elipse") {
+        drawEllipse(ctx, figura.startX, figura.startY, figura.a, figura.b, figura.stroke);
+    } else if (figura.tipo === "poligono") {
+        drawPolygon(ctx, figura.numSides, figura.radiusP, figura.startX, figura.startY, figura.initialAngle, figura.stroke);
+        //} else if (figura.tipo === "lapiz") {
+        //    for (let i = 0; i < drawingPoints.length; i++) {
+        //        figura.points[i].x += diffX;
+        //        figura.points[i].y += diffY;
+        //    }
+        //    for (let i = 1; i < figura.points.length; i++) {
+
+        //        const startPoint = figura.points[i - 1];
+        //        const endPoint = figura.points[i];
+
+        //        drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, figura.stroke);
+
+        //    }
+    } else if (figura.tipo === "rombo") {
+        drawRhombus(ctx, figura.startX, figura.startY, figura.endX, figura.endY, figura.stroke);
+    } else if (figura.tipo === "trapecio") {
+        drawTrapezoid(ctx, figura.startX, figura.startY, figura.endX, figura.endY, figura.stroke);
+    }
+
+}
+
+canvas.addEventListener("mouseup", function(event) {
+    if (figuraSeleccionada !== null) {
+        canvas.removeEventListener("mousemove", moverFigura);
+        figuraSeleccionada = null;
+        indiceFiguraSeleccionada = -1;
+
+        canvas.style.cursor = "default";
+    }
+});
+
+function downloadPNG() {
+    const imgData = canvas.toDataURL('image/png');
+
+    // Guardar el vector de figuras en un archivo JSON
+    const datosJSON = JSON.stringify(formasDibujadas);
+    const blob = new Blob([datosJSON], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    // Crear un enlace para descargar el archivo JSON
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = 'canvas.json';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    // Crear un enlace para descargar la imagen
+    downloadLink = document.createElement('b');
+    downloadLink.href = imgData;
+    downloadLink.download = 'canvas.png';
+
+    // Simular un clic en el enlace para iniciar la descarga
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+
+// Evento al cargar un archivo JSON
+document.getElementById('archivoInput').addEventListener('change', function(event) {
+    const archivo = event.target.files[0];
+
+    if (archivo && archivo.type === 'application/json') {
+        const lector = new FileReader();
+
+        // Evento al cargar el archivo
+        lector.onload = function(e) {
+            // Limpiar el lienzo
+            const formasDibujadas = JSON.parse(e.target.result);
+
+            // Dibujar las figuras del archivo JSON en el canvas
+            formasDibujadas.forEach(forma => {
+                drawAll(forma);
+                formasDibujadas.push(forma);
+            });
+        };
+
+        lector.readAsText(archivo); // Leer el archivo como texto
+    }
+});
