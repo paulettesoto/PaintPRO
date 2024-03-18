@@ -207,6 +207,14 @@ imagenes.forEach(function(img) {
             downloadPNG();
         } else if (figura == "nuevo") {
             newCanvas();
+        } else if (figura == "moverAtras" && figuraSeleccionada !== null) {
+            moveBehind(indiceFiguraSeleccionada);
+        } else if (figura == "moverAlFondo" && figuraSeleccionada !== null) {
+            moveBottom(indiceFiguraSeleccionada);
+        } else if (figura == "moverAdelante" && figuraSeleccionada !== null) {
+            moveUp(indiceFiguraSeleccionada);
+        } else if (figura == "moverEnfrente" && figuraSeleccionada !== null) {
+            moveFront(indiceFiguraSeleccionada);
         } else {
             // Si no es "seleccion", eliminar el evento para detectar la figura seleccionada
             canvas.removeEventListener("click", detectarFiguraSeleccionada);
@@ -524,4 +532,75 @@ function newCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     formasDibujadas.length = 0;
+}
+
+// Función para mover una figura hacia atrás
+function moveBehind(index) {
+    // Verificar que el índice esté dentro de los límites del array
+    if (index < 1 || index >= formasDibujadas.length) {
+        console.log('Indice fuera de rango');
+        return;
+    }
+
+    // Intercambiar la posición del elemento seleccionado con el elemento anterior
+    const temp = formasDibujadas[index - 1];
+
+    formasDibujadas[index - 1] = formasDibujadas[index];
+    formasDibujadas[index] = temp;
+    formasDibujadas.forEach(forma => {
+        drawAll(forma);
+    });
+}
+
+// Función para mover una figura al fondo
+function moveBottom(index) {
+    // Verificar que el índice esté dentro de los límites del array
+    if (index < 0 || index >= formasDibujadas.length) {
+        console.log('Índice fuera de rango');
+        return;
+    }
+
+    // Remover la figura del índice dado y agregarla al principio del array
+    const figura = formasDibujadas.splice(index, 1)[0];
+    formasDibujadas.unshift(figura);
+
+    formasDibujadas.forEach(forma => {
+        drawAll(forma);
+    });
+}
+
+// Función para mover una figura una posición hacia arriba
+function moveUp(index) {
+    // Verificar que el índice esté dentro de los límites del array
+    if (index < 1 || index >= formasDibujadas.length) {
+        console.log('Índice fuera de rango');
+        return;
+    }
+
+    // Intercambiar la posición del elemento seleccionado con el elemento anterior
+    const temp = formasDibujadas[index - 1];
+
+    formasDibujadas[index - 1] = formasDibujadas[index];
+    formasDibujadas[index] = temp;
+
+    formasDibujadas.forEach(forma => {
+        drawAll(forma);
+    });
+}
+
+// Función para mover una figura hasta enfrente
+function moveFront(index) {
+    // Verificar que el índice esté dentro de los límites del array
+    if (index < 0 || index >= formasDibujadas.length - 1) {
+        console.log('Índice fuera de rango');
+        return;
+    }
+
+    // Remover la figura del índice dado y agregarla al final del array
+    const figura = formasDibujadas.splice(index, 1)[0];
+    formasDibujadas.push(figura);
+
+    formasDibujadas.forEach(forma => {
+        drawAll(forma);
+    });
 }
