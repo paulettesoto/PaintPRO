@@ -1,4 +1,3 @@
-// Importar las funciones necesarias de cada módulo
 import { drawLineBresenham, setColor, selectedLineBresenham } from './lineaBresenham.js';
 import { drawSquare, selectedSquare } from './cuadrado.js';
 import { drawCircleBresenham, selectedCircleBresenham } from './circulo.js';
@@ -39,8 +38,6 @@ canvas.addEventListener("mousedown", function(event) {
         canvas.addEventListener("mousemove", moverFigura);
         canvas.style.cursor = "move";
     } else {
-
-        // Obtener las coordenadas del click
         if (figura === "poligono") {
             startX = event.offsetX;
             startY = event.offsetY;
@@ -225,7 +222,6 @@ function drawAll(forma) {
 
 const imagenes = document.querySelectorAll('.icon');
 
-// Agregar un evento de clic a cada imagen
 imagenes.forEach(function(img) {
     img.addEventListener('click', function() {
         // Obtener el valor del atributo data-value de la imagen
@@ -261,7 +257,7 @@ imagenes.forEach(function(img) {
     });
 });
 
-// Obtener el elemento input de color
+
 const colorPicker = document.getElementById('colorPicker');
 
 // Escuchar cambios en el color seleccionado
@@ -273,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
     selectedColor = colorPicker.value;
 });
 
-// Obtener el select tamaño
+// Obtener el tamaño
 const selectSize = document.getElementById('stroke');
 
 // Escuchar cambios

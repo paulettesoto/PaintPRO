@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width">
     <title>Paint PRO</title>
     <style>
+        .file-tools {
+            margin: 0;
+            width: 96%;
+            position: absolute;
+            display: flex;
+        }
+        
         .toolbar {
             background-color: rgb(199, 198, 198);
             margin: 0;
@@ -18,7 +25,7 @@
         }
         
         .tool {
-            margin: auto 2% 10px 1%;
+            margin: auto 1% 10px 0.5%;
         }
         
         .icon {
@@ -44,10 +51,20 @@
 
 <body>
     <div class="toolbar">
-        <div class="new tool">
-            <img src="./icons/nuevo-documento.png" class="icon new" data-value="nuevo">
+        <div class="file-tools">
+            <div class="open tool">
+                <label for="archivoInput">
+                    <img src="./icons/carpeta-abierta.png" class="icon abrirJSON">
+                </label>
+                <input type="file" id="archivoInput" accept=".json" style="display: none;">
+            </div>
+            <div class="new tool">
+                <img src="./icons/nuevo-documento.png" class="icon new" data-value="nuevo">
+            </div>
+            <div class="save tool">
+                <img src="./icons/disquete.png" class="icon guardarPNG" data-value="png">
+            </div>
 
-            <br> Nuevo archivo
         </div>
         <div class="selection tool">
             <img src="./icons/cursor.png" class="icon selection" data-value="seleccion">
@@ -105,18 +122,6 @@
 
             <br> Capas
         </div>
-        <div class="save tool">
-            <img src="./icons/guardar-el-archivo.png" class="icon guardarPNG" data-value="png">
-            <br>Guardar
-        </div>
-        <div class="open tool">
-            <label for="archivoInput">
-                <img src="./icons/carpeta-abierta.png" class="icon abrirJSON">
-                <br>Abrir
-            </label>
-            <input type="file" id="archivoInput" accept=".json" style="display: none;">
-        </div>
-
     </div>
     <canvas id="canvas" width="1500" height="563" style="border:1px solid black;"></canvas>
     <script type="module" src="objeto.js"></script>
