@@ -26,6 +26,18 @@
             width: 25px;
             height: 25px;
         }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+        
+        .layers.grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 10px;
+        }
     </style>
 </head>
 
@@ -43,25 +55,27 @@
             <br> Selección
         </div>
         <div class="image tool">
-
+            <img src="./icons/escala.png" class="icon escala" data-value="escala">
             <br> Imagen
         </div>
         <div class="tools tool">
             <img src="./icons/lapiz (1).png" class="icon lapiz" data-value="lapiz">
             <br> Herramientas
         </div>
-        <div class="pen tool">
+        <!-- <div class="pen tool">
             <br> Pinceles
-        </div>
+        </div>-->
         <div class="shapes tool">
-            <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
-            <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
-            <img src="./icons/rectangulo-panoramico.png" class="icon rect" data-value="rectangulo">
-            <img src="./icons/circulo.png" class="icon circle" data-value="circulo">
-            <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon ellipse" data-value="elipse">
-            <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
-            <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
-            <img src="./icons/trapecio.png" class="icon trapecio" data-value="trapecio">
+            <div class="grid-container">
+                <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
+                <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
+                <img src="./icons/rectangulo-panoramico.png" class="icon rect" data-value="rectangulo">
+                <img src="./icons/circulo.png" class="icon circle" data-value="circulo">
+                <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon ellipse" data-value="elipse">
+                <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
+                <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
+                <img src="./icons/trapecio.png" class="icon trapecio" data-value="trapecio">
+            </div>
             <br> Formas
         </div>
         <div class="size tool">
@@ -80,10 +94,14 @@
             <br> Colores
         </div>
         <div class="layers tool">
-            <img src="./icons/moverAtras.png" class="icon moverAtras" data-value="moverAtras">
-            <img src="./icons/moverFondo.png" class="icon moverAlFondo" data-value="moverAlFondo">
-            <img src="./icons/moverAdelante.png" class="icon moverAdelante" data-value="moverAdelante">
-            <img src="./icons/moverEnfrente.png" class="icon moverEnfrente" data-value="moverEnfrente">
+            <div class="layers grid-container">
+                <img src="./icons/moverAtras.png" class="icon moverAtras" data-value="moverAtras">
+                <img src="./icons/moverAdelante.png" class="icon moverAdelante" data-value="moverAdelante">
+                <img src="./icons/moverFondo.png" class="icon moverAlFondo" data-value="moverAlFondo">
+                <img src="./icons/moverEnfrente.png" class="icon moverEnfrente" data-value="moverEnfrente">
+
+            </div>
+
             <br> Capas
         </div>
         <div class="save tool">
@@ -99,7 +117,7 @@
         </div>
 
     </div>
-    <canvas id="canvas" width="1518" height="563" style="border:1px solid black;"></canvas>
+    <canvas id="canvas" width="1500" height="563" style="border:1px solid black;"></canvas>
     <script type="module" src="objeto.js"></script>
     <script>
         function callLine() {

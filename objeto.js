@@ -25,28 +25,33 @@ initialAngle = 0;
 radiusP = 50;
 
 canvas.addEventListener("mousedown", function(event) {
-    // Obtener las coordenadas del click
-    var rect = canvas.getBoundingClientRect();
-    if (figura === "poligono") {
-        startX = event.offsetX;
-        startY = event.offsetY;
-        mouseX = startX;
-        mouseY = startY;
-        initialAngle = 0;
-    } else if (figura === "lapiz") {
-        drawingPoints = []; // Limpiar los puntos dibujados
-
-        var x = event.clientX - canvas.offsetLeft;
-        var y = event.clientY - canvas.offsetTop;
-
-        drawingPoints.push({ x, y });
-
+    if (figuraSeleccionada !== null) {
+        canvas.addEventListener("mousemove", moverFigura);
+        canvas.style.cursor = "move";
     } else {
-        startX = Math.round(event.clientX - rect.left);
-        startY = Math.round(event.clientY - rect.top);
-    }
+        // Obtener las coordenadas del click
+        var rect = canvas.getBoundingClientRect();
+        if (figura === "poligono") {
+            startX = event.offsetX;
+            startY = event.offsetY;
+            mouseX = startX;
+            mouseY = startY;
+            initialAngle = 0;
+        } else if (figura === "lapiz") {
+            drawingPoints = []; // Limpiar los puntos dibujados
 
-    isDrawing = true;
+            var x = event.clientX - canvas.offsetLeft;
+            var y = event.clientY - canvas.offsetTop;
+
+            drawingPoints.push({ x, y });
+
+        } else {
+            startX = Math.round(event.clientX - rect.left);
+            startY = Math.round(event.clientY - rect.top);
+        }
+
+        isDrawing = true;
+    }
 });
 
 canvas.addEventListener("mousemove", function(event) {
@@ -114,51 +119,59 @@ canvas.addEventListener("mousemove", function(event) {
 });
 
 canvas.addEventListener("mouseup", function(event) {
-    if (!isDrawing) return;
+    if (figuraSeleccionada !== null) {
+        canvas.removeEventListener("mousemove", moverFigura);
+        figuraSeleccionada = null;
+        indiceFiguraSeleccionada = -1;
 
-    var rect = canvas.getBoundingClientRect();
+        canvas.style.cursor = "default";
+    } else {
+        if (!isDrawing) return;
 
-    var x = Math.round(event.clientX - rect.left);
-    var y = Math.round(event.clientY - rect.top);
+        var rect = canvas.getBoundingClientRect();
 
-    //Tamaño cuadrado
-    var size = Math.abs(x - startX);
-    //Radio del circulo
-    var radius = Math.round(Math.sqrt((x - startX) ** 2 + (y - startY) ** 2));
-    //Ancho y altura del rectangulo
-    var width = x - startX;
-    var height = y - startY;
-    // Calcular los semiejes de la elipse
-    var a = Math.abs(x - startX);
-    var b = Math.abs(y - startY);
-    // Hacer una copia de los puntos dibujados  
+        var x = Math.round(event.clientX - rect.left);
+        var y = Math.round(event.clientY - rect.top);
 
-    var points = drawingPoints.slice();
+        //Tamaño cuadrado
+        var size = Math.abs(x - startX);
+        //Radio del circulo
+        var radius = Math.round(Math.sqrt((x - startX) ** 2 + (y - startY) ** 2));
+        //Ancho y altura del rectangulo
+        var width = x - startX;
+        var height = y - startY;
+        // Calcular los semiejes de la elipse
+        var a = Math.abs(x - startX);
+        var b = Math.abs(y - startY);
+        // Hacer una copia de los puntos dibujados  
 
-    var forma = {
-        tipo: figura,
-        startX: startX,
-        startY: startY,
-        endX: x,
-        endY: y,
-        size: size,
-        radius: radius,
-        width: width,
-        height: height,
-        a: a,
-        b: b,
-        numSides: numSides,
-        radiusP: radiusP,
-        initialAngle: initialAngle,
-        points: points,
-        color: selectedColor,
-        stroke: stroke
-    };
+        var points = drawingPoints.slice();
 
-    // Almacenar la forma dibujada actualmente
-    formasDibujadas.push(forma);
+        var forma = {
+            tipo: figura,
+            startX: startX,
+            startY: startY,
+            endX: x,
+            endY: y,
+            size: size,
+            radius: radius,
+            width: width,
+            height: height,
+            a: a,
+            b: b,
+            numSides: numSides,
+            radiusP: radiusP,
+            initialAngle: initialAngle,
+            points: points,
+            color: selectedColor,
+            stroke: stroke
+        };
 
-    isDrawing = false;
+        // Almacenar la forma dibujada actualmente
+        formasDibujadas.push(forma);
+
+        isDrawing = false;
+    }
 });
 
 function drawAll(forma) {
@@ -264,7 +277,7 @@ function detectarFiguraSeleccionada(event) {
             if (selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
                 console.log("Linea seleccionada");
 
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -275,7 +288,7 @@ function detectarFiguraSeleccionada(event) {
             if (selectedSquare(ctx, forma.startX, forma.startY, forma.size, forma.stroke, x, y)) {
                 console.log("Cuadrado seleccionada");
 
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -286,7 +299,7 @@ function detectarFiguraSeleccionada(event) {
             if (selectedCircleBresenham(ctx, forma.startX, forma.startY, forma.radius, forma.stroke, x, y)) {
                 console.log("Circulo seleccionada");
 
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -297,7 +310,7 @@ function detectarFiguraSeleccionada(event) {
             if (selectedRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke, x, y)) {
                 console.log("Rectangulo seleccionada");
 
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -308,7 +321,7 @@ function detectarFiguraSeleccionada(event) {
             if (selectedEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b, forma.stroke, x, y)) {
                 console.log("Elipse seleccionada");
 
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -319,7 +332,7 @@ function detectarFiguraSeleccionada(event) {
             if (selectedPolygon(ctx, forma.numSides, forma.radiusP, forma.startX, forma.startY, forma.initialAngle, forma.stroke, x, y)) {
                 console.log("Poligono seleccionada");
 
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -337,7 +350,7 @@ function detectarFiguraSeleccionada(event) {
             //        if (selectedLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, forma.stroke, x, y)) {
             //            console.log("Mano alzada seleccionada");
             //
-            //    drawAll(forma);
+            //    //drawAll(forma);
             //            figuraSeleccionada = forma;
             //            console.log(figuraSeleccionada);
             //            indiceFiguraSeleccionada = i;
@@ -352,7 +365,7 @@ function detectarFiguraSeleccionada(event) {
             if (selectedRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
                 console.log("Rombo seleccionada");
 
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -362,7 +375,7 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
                 console.log("Linea seleccionada");
-                drawAll(forma);
+                //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -372,15 +385,6 @@ function detectarFiguraSeleccionada(event) {
     }
     figuraSeleccionada = null;
 }
-
-canvas.addEventListener("mousedown", function(event) {
-    if (figuraSeleccionada !== null) {
-        canvas.addEventListener("mousemove", moverFigura);
-        canvas.style.cursor = "move";
-    } else {
-        return
-    }
-});
 
 function moverFigura(event) {
     const rect = canvas.getBoundingClientRect();
@@ -459,16 +463,6 @@ function moverFigura(event) {
 
 }
 
-canvas.addEventListener("mouseup", function(event) {
-    if (figuraSeleccionada !== null) {
-        canvas.removeEventListener("mousemove", moverFigura);
-        figuraSeleccionada = null;
-        indiceFiguraSeleccionada = -1;
-
-        canvas.style.cursor = "default";
-    }
-});
-
 function downloadPNG() {
     const imgData = canvas.toDataURL('image/png');
 
@@ -536,8 +530,9 @@ function newCanvas() {
 
 // Función para mover una figura hacia atrás
 function moveBehind(index) {
+    console.log(index);
     // Verificar que el índice esté dentro de los límites del array
-    if (index < 1 || index >= formasDibujadas.length) {
+    if (index < 0 || index >= formasDibujadas.length) {
         console.log('Indice fuera de rango');
         return;
     }
@@ -554,6 +549,7 @@ function moveBehind(index) {
 
 // Función para mover una figura al fondo
 function moveBottom(index) {
+    console.log(index);
     // Verificar que el índice esté dentro de los límites del array
     if (index < 0 || index >= formasDibujadas.length) {
         console.log('Índice fuera de rango');
@@ -569,20 +565,20 @@ function moveBottom(index) {
     });
 }
 
-// Función para mover una figura una posición hacia arriba
+// Función para mover una figura hacia adelante
 function moveUp(index) {
+    console.log(index);
     // Verificar que el índice esté dentro de los límites del array
-    if (index < 1 || index >= formasDibujadas.length) {
-        console.log('Índice fuera de rango');
+    if (index < 0 || index >= formasDibujadas.length - 1) {
+        console.log('Indice fuera de rango');
         return;
     }
 
-    // Intercambiar la posición del elemento seleccionado con el elemento anterior
-    const temp = formasDibujadas[index - 1];
+    // Intercambiar la posición del elemento seleccionado con el elemento siguiente
+    const temp = formasDibujadas[index + 1];
 
-    formasDibujadas[index - 1] = formasDibujadas[index];
+    formasDibujadas[index + 1] = formasDibujadas[index];
     formasDibujadas[index] = temp;
-
     formasDibujadas.forEach(forma => {
         drawAll(forma);
     });
@@ -590,6 +586,7 @@ function moveUp(index) {
 
 // Función para mover una figura hasta enfrente
 function moveFront(index) {
+    console.log(index);
     // Verificar que el índice esté dentro de los límites del array
     if (index < 0 || index >= formasDibujadas.length - 1) {
         console.log('Índice fuera de rango');
