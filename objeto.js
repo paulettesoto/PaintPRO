@@ -23,14 +23,24 @@ var isDrawing = false;
 var numSides = 7;
 initialAngle = 0;
 radiusP = 50;
+let figuraSeleccionada = null;
+let indiceFiguraSeleccionada = -1;
+let angle = 0;
 
 canvas.addEventListener("mousedown", function(event) {
-    if (figuraSeleccionada !== null) {
+    var rect = canvas.getBoundingClientRect();
+    if (figuraSeleccionada !== null && figura == "escala") {
+
+        startX = Math.round(event.clientX - rect.left);
+        startY = Math.round(event.clientY - rect.top);
+        canvas.addEventListener("mousemove", resize);
+    } else if (figuraSeleccionada !== null && figura !== "borrar") {
+
         canvas.addEventListener("mousemove", moverFigura);
         canvas.style.cursor = "move";
     } else {
+
         // Obtener las coordenadas del click
-        var rect = canvas.getBoundingClientRect();
         if (figura === "poligono") {
             startX = event.offsetX;
             startY = event.offsetY;
@@ -46,6 +56,7 @@ canvas.addEventListener("mousedown", function(event) {
             drawingPoints.push({ x, y });
 
         } else {
+
             startX = Math.round(event.clientX - rect.left);
             startY = Math.round(event.clientY - rect.top);
         }
@@ -81,7 +92,6 @@ canvas.addEventListener("mousemove", function(event) {
 
     if (isDrawing) {
         setColor(ctx, selectedColor);
-
         if (figura === "linea") {
             drawLineBresenham(ctx, startX, startY, x, y, stroke);
         } else if (figura === "cuadrado") {
@@ -119,12 +129,19 @@ canvas.addEventListener("mousemove", function(event) {
 });
 
 canvas.addEventListener("mouseup", function(event) {
-    if (figuraSeleccionada !== null) {
+    if (figuraSeleccionada !== null && figura == "escala") {
+        canvas.removeEventListener("mousemove", resize);
+        // Actualizar la figura redimensionada en el arreglo
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+        figuraSeleccionada = null;
+        indiceFiguraSeleccionada = -1;
+        canvas.removeEventListener("click", detectarFiguraSeleccionada);
+    } else if (figuraSeleccionada !== null && figura !== "borrar") {
         canvas.removeEventListener("mousemove", moverFigura);
         figuraSeleccionada = null;
         indiceFiguraSeleccionada = -1;
-
         canvas.style.cursor = "default";
+        canvas.removeEventListener("click", detectarFiguraSeleccionada);
     } else {
         if (!isDrawing) return;
 
@@ -215,21 +232,29 @@ imagenes.forEach(function(img) {
         figura = this.getAttribute('data-value');
         console.log(figura)
         if (figura === "seleccion") {
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             canvas.addEventListener("click", detectarFiguraSeleccionada);
         } else if (figura == "png") {
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             downloadPNG();
         } else if (figura == "nuevo") {
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             newCanvas();
         } else if (figura == "moverAtras" && figuraSeleccionada !== null) {
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             moveBehind(indiceFiguraSeleccionada);
         } else if (figura == "moverAlFondo" && figuraSeleccionada !== null) {
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             moveBottom(indiceFiguraSeleccionada);
         } else if (figura == "moverAdelante" && figuraSeleccionada !== null) {
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             moveUp(indiceFiguraSeleccionada);
         } else if (figura == "moverEnfrente" && figuraSeleccionada !== null) {
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             moveFront(indiceFiguraSeleccionada);
+        } else if (figura === "borrar") {
+            canvas.addEventListener("click", detectarFiguraSeleccionada);
         } else {
-            // Si no es "seleccion", eliminar el evento para detectar la figura seleccionada
             canvas.removeEventListener("click", detectarFiguraSeleccionada);
         }
 
@@ -248,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     selectedColor = colorPicker.value;
 });
 
-// Obtener el elemento select tamaño
+// Obtener el select tamaño
 const selectSize = document.getElementById('stroke');
 
 // Escuchar cambios
@@ -260,9 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
     stroke = parseInt(selectSize.value);
 });
 
-let figuraSeleccionada = null;
-let indiceFiguraSeleccionada = -1;
-
 function detectarFiguraSeleccionada(event) {
     var rect = canvas.getBoundingClientRect();
     var x = Math.round(event.clientX - rect.left);
@@ -272,7 +294,6 @@ function detectarFiguraSeleccionada(event) {
     for (var i = formasDibujadas.length - 1; i >= 0; i--) {
         var forma = formasDibujadas[i];
         if (forma.tipo === "linea") {
-
             //console.log(selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y));
             if (selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
                 console.log("Linea seleccionada");
@@ -280,6 +301,9 @@ function detectarFiguraSeleccionada(event) {
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
@@ -291,6 +315,9 @@ function detectarFiguraSeleccionada(event) {
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
@@ -302,6 +329,9 @@ function detectarFiguraSeleccionada(event) {
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
@@ -313,6 +343,9 @@ function detectarFiguraSeleccionada(event) {
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
@@ -324,6 +357,9 @@ function detectarFiguraSeleccionada(event) {
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
@@ -335,6 +371,9 @@ function detectarFiguraSeleccionada(event) {
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
@@ -354,6 +393,9 @@ function detectarFiguraSeleccionada(event) {
             //            figuraSeleccionada = forma;
             //            console.log(figuraSeleccionada);
             //            indiceFiguraSeleccionada = i;
+            //if (figura === "borrar") {
+            //    deleteShape(indiceFiguraSeleccionada);
+            // }
             //            return
             //        }
 
@@ -368,16 +410,22 @@ function detectarFiguraSeleccionada(event) {
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
         } else if (forma.tipo === "trapecio") {
 
             if (selectedTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
-                console.log("Linea seleccionada");
+                console.log("Trapecio seleccionada");
                 //drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
+                if (figura === "borrar") {
+                    deleteShape(indiceFiguraSeleccionada);
+                }
                 return
             }
 
@@ -600,4 +648,60 @@ function moveFront(index) {
     formasDibujadas.forEach(forma => {
         drawAll(forma);
     });
+}
+
+function resize(event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = Math.round(event.clientX - rect.left);
+    var y = Math.round(event.clientY - rect.top);
+    var diffX = x - startX;
+    var diffY = y - startY;
+    if (figuraSeleccionada !== null && figuraSeleccionada.tipo !== "lapiz") {
+        if (figuraSeleccionada.tipo === "linea") {
+            figuraSeleccionada.endX += diffX;
+            figuraSeleccionada.endY += diffY;
+        } else if (figuraSeleccionada.tipo === "cuadrado") {
+            var newSize = Math.max(figuraSeleccionada.size + diffX, figuraSeleccionada.size + diffY);
+            figuraSeleccionada.size = newSize;
+        } else if (figuraSeleccionada.tipo === "rectangulo") {
+            figuraSeleccionada.width += diffX;
+            figuraSeleccionada.height += diffY;
+        } else if (figuraSeleccionada.tipo === "circulo") {
+            var radius = Math.round(Math.sqrt((x - figuraSeleccionada.startX) ** 2 + (y - figuraSeleccionada.startY) ** 2));
+            figuraSeleccionada.radius = radius;
+        } else if (figuraSeleccionada.tipo === "elipse") {
+            figuraSeleccionada.a += diffX;
+            figuraSeleccionada.b += diffY;
+        } else if (figuraSeleccionada.tipo === "poligono") {
+            figuraSeleccionada.radiusP = Math.sqrt(diffX ** 2 + diffY ** 2);
+            // Calcular el nuevo radioP y el nuevo ángulo inicial
+            figuraSeleccionada.radiusP = Math.sqrt(Math.pow(x - figuraSeleccionada.startX, 2) + Math.pow(y - figuraSeleccionada.startY, 2));
+            figuraSeleccionada.initialAngle = Math.atan2(y - figuraSeleccionada.startY, x - figuraSeleccionada.startX);
+        } else if (figuraSeleccionada.tipo === "rombo") {
+            figuraSeleccionada.endX += diffX;
+            figuraSeleccionada.endY += diffY;
+        } else if (figuraSeleccionada.tipo === "trapecio") {
+            figuraSeleccionada.endX += diffX;
+            figuraSeleccionada.endY += diffY;
+        }
+        startX = x;
+        startY = y;
+
+        // Limpiar el lienzo y dibujar todas las figuras actualizadas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        formasDibujadas.forEach(function(forma) {
+            drawAll(forma);
+        });
+    }
+}
+
+function deleteShape(index) {
+    formasDibujadas.splice(index, 1); // Eliminar la forma del arreglo
+
+    // Limpiar el lienzo y dibujar todas las figuras actualizadas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    formasDibujadas.forEach(function(forma) {
+        drawAll(forma);
+    });
+
 }
