@@ -7,6 +7,7 @@ import { drawEllipse, selectedEllipse } from './elipse.js';
 import { drawPolygon, selectedPolygon } from './poligonos.js';
 import { drawRhombus, selectedRhombus } from './rombo.js';
 import { drawTrapezoid, selectedTrapezoid } from './trapecio.js';
+//import jsPDF from 'jspdf';
 
 // Obtener el lienzo y el contexto
 var canvas = document.getElementById("canvas");
@@ -204,6 +205,8 @@ imagenes.forEach(function(img) {
             canvas.addEventListener("click", detectarFiguraSeleccionada);
         } else if (figura == "png") {
             downloadPNG();
+        } else if (figura == "nuevo") {
+            newCanvas();
         } else {
             // Si no es "seleccion", eliminar el evento para detectar la figura seleccionada
             canvas.removeEventListener("click", detectarFiguraSeleccionada);
@@ -252,6 +255,8 @@ function detectarFiguraSeleccionada(event) {
             //console.log(selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y));
             if (selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
                 console.log("Linea seleccionada");
+
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -261,6 +266,8 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedSquare(ctx, forma.startX, forma.startY, forma.size, forma.stroke, x, y)) {
                 console.log("Cuadrado seleccionada");
+
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -270,6 +277,8 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedCircleBresenham(ctx, forma.startX, forma.startY, forma.radius, forma.stroke, x, y)) {
                 console.log("Circulo seleccionada");
+
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -279,6 +288,8 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke, x, y)) {
                 console.log("Rectangulo seleccionada");
+
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -288,6 +299,8 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b, forma.stroke, x, y)) {
                 console.log("Elipse seleccionada");
+
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -297,6 +310,8 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedPolygon(ctx, forma.numSides, forma.radiusP, forma.startX, forma.startY, forma.initialAngle, forma.stroke, x, y)) {
                 console.log("Poligono seleccionada");
+
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -313,6 +328,8 @@ function detectarFiguraSeleccionada(event) {
 
             //        if (selectedLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, forma.stroke, x, y)) {
             //            console.log("Mano alzada seleccionada");
+            //
+            //    drawAll(forma);
             //            figuraSeleccionada = forma;
             //            console.log(figuraSeleccionada);
             //            indiceFiguraSeleccionada = i;
@@ -326,6 +343,8 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
                 console.log("Rombo seleccionada");
+
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
@@ -335,16 +354,15 @@ function detectarFiguraSeleccionada(event) {
 
             if (selectedTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
                 console.log("Linea seleccionada");
+                drawAll(forma);
                 figuraSeleccionada = forma;
                 indiceFiguraSeleccionada = i;
                 return
             }
 
-        } else {
-            figuraSeleccionada = null;
-
         }
     }
+    figuraSeleccionada = null;
 }
 
 canvas.addEventListener("mousedown", function(event) {
@@ -452,22 +470,29 @@ function downloadPNG() {
     const url = URL.createObjectURL(blob);
 
     // Crear un enlace para descargar el archivo JSON
-    const downloadLink = document.createElement('a');
-    downloadLink.href = url;
-    downloadLink.download = 'canvas.json';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    const downloadJSON = document.createElement('a');
+    downloadJSON.href = url;
+    downloadJSON.download = 'canvas.json';
+    document.body.appendChild(downloadJSON);
+    downloadJSON.click();
+    document.body.removeChild(downloadJSON);
 
     // Crear un enlace para descargar la imagen
-    downloadLink = document.createElement('b');
-    downloadLink.href = imgData;
-    downloadLink.download = 'canvas.png';
+    const downloadPNG = document.createElement('a');
+    downloadPNG.href = imgData;
+    downloadPNG.download = 'mi-canvas.png';
+    document.body.appendChild(downloadPNG);
+    downloadPNG.click();
+    document.body.removeChild(downloadPNG);
 
-    // Simular un clic en el enlace para iniciar la descarga
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    //guardar PDF
+    //const pdf = new jsPDF();
+
+    // Agregar la imagen al PDF
+    //pdf.addImage(imgData, 'PNG', 10, 10, 180, 130); // (imagen, formato, x, y, ancho, alto)
+
+    // Guardar el PDF
+    //pdf.save('mi_documento.pdf');
 }
 
 
@@ -481,10 +506,10 @@ document.getElementById('archivoInput').addEventListener('change', function(even
         // Evento al cargar el archivo
         lector.onload = function(e) {
             // Limpiar el lienzo
-            const formasDibujadas = JSON.parse(e.target.result);
+            const formasJSON = JSON.parse(e.target.result);
 
             // Dibujar las figuras del archivo JSON en el canvas
-            formasDibujadas.forEach(forma => {
+            formasJSON.forEach(forma => {
                 drawAll(forma);
                 formasDibujadas.push(forma);
             });
@@ -493,3 +518,10 @@ document.getElementById('archivoInput').addEventListener('change', function(even
         lector.readAsText(archivo); // Leer el archivo como texto
     }
 });
+
+// Función para limpiar el lienzo y el objeto
+function newCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    formasDibujadas.length = 0;
+}

@@ -11,42 +11,14 @@
             margin: 0;
             padding-top: 1%;
             width: 100%;
-            min-height: 19vh;
+            min-height: 10vh;
             display: flex;
             text-align: center;
             justify-content: center;
         }
         
-        .selection {
-            margin: 0 2% 0 1%;
-        }
-        
-        .image {
-            margin: 0 2% 0 1%;
-        }
-        
-        .tools {
-            margin: 0 2% 0 1%;
-        }
-        
-        .pen {
-            margin: 0 2% 0 1%;
-        }
-        
-        .shapes {
-            margin: 0 2% 0 1%;
-        }
-        
-        .size {
-            margin: 0 2% 0 1%;
-        }
-        
-        .colors {
-            margin: 0 2% 0 1%;
-        }
-        
-        .layers {
-            margin: 0 2% 0 1%;
+        .tool {
+            margin: auto 2% 10px 1%;
         }
         
         .icon {
@@ -60,23 +32,28 @@
 
 <body>
     <div class="toolbar">
-        <div class="selection">
+        <div class="new tool">
+            <img src="./icons/nuevo-documento.png" class="icon new" data-value="nuevo">
+
+            <br> Nuevo archivo
+        </div>
+        <div class="selection tool">
             <img src="./icons/cursor.png" class="icon selection" data-value="seleccion">
 
             <br> Selección
         </div>
-        <div class="image">
+        <div class="image tool">
 
             <br> Imagen
         </div>
-        <div class="tools">
+        <div class="tools tool">
             <img src="./icons/lapiz (1).png" class="icon lapiz" data-value="lapiz">
             <br> Herramientas
         </div>
-        <div class="pen">
+        <div class="pen tool">
             <br> Pinceles
         </div>
-        <div class="shapes">
+        <div class="shapes tool">
             <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
             <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
             <img src="./icons/rectangulo-panoramico.png" class="icon rect" data-value="rectangulo">
@@ -87,7 +64,7 @@
             <img src="./icons/trapecio.png" class="icon trapecio" data-value="trapecio">
             <br> Formas
         </div>
-        <div class="size">
+        <div class="size tool">
             <select id="stroke" value="1">
                 <option value="1">1px</option>
                 <option value="2">2px</option>
@@ -98,24 +75,27 @@
               </select>
             <br> Tamaño
         </div>
-        <div class="colors">
+        <div class="colors tool">
             <input type="color" value="#000000" id="colorPicker" name="colorPicker">
             <br> Colores
         </div>
-        <div class="layers">
+        <div class="layers tool">
             <br> Capas
         </div>
-        <div class="save">
+        <div class="save tool">
             <img src="./icons/guardar-el-archivo.png" class="icon guardarPNG" data-value="png">
             <br>Guardar
         </div>
-        <div class="open">
-            <input type="file" id="archivoInput" accept=".json">
-            <br>Abrir
+        <div class="open tool">
+            <label for="archivoInput">
+                <img src="./icons/carpeta-abierta.png" class="icon abrirJSON">
+                <br>Abrir
+            </label>
+            <input type="file" id="archivoInput" accept=".json" style="display: none;">
         </div>
 
     </div>
-    <canvas id="canvas" width="1500" height="540" style="border:1px solid black;"></canvas>
+    <canvas id="canvas" width="1518" height="563" style="border:1px solid black;"></canvas>
     <script type="module" src="objeto.js"></script>
     <script>
         function callLine() {
@@ -124,6 +104,8 @@
             document.head.appendChild(script);
         }
     </script>
+
+
 
 
 </body>
