@@ -19,7 +19,7 @@ let drawingPoints = [];
 // Manejar eventos de dibujo (mousedown, mousemove, mouseup)
 var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle, selectedColor, stroke, initial;
 var isDrawing = false;
-var numSides = 7;
+var numSides = 0;
 initialAngle = 0;
 radiusP = 50;
 let figuraSeleccionada = null;
@@ -242,6 +242,8 @@ imagenes.forEach(function(img) {
         figura = this.getAttribute('data-value');
         console.log(figura)
         if (figura === "seleccion") {
+            figuraSeleccionada = null;
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
             canvas.addEventListener("click", detectarFiguraSeleccionada);
         } else if (figura == "png") {
             canvas.removeEventListener("click", detectarFiguraSeleccionada);
@@ -264,6 +266,16 @@ imagenes.forEach(function(img) {
         } else if (figura === "borrar") {
             canvas.removeEventListener("mousemove", drawing);
             canvas.addEventListener("click", detectarFiguraSeleccionada);
+        } else if (figura === "girarIz") {
+            canvas.removeEventListener("mousemove", drawing);
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
+            turnleft();
+
+        } else if (figura === "girarDe") {
+            canvas.removeEventListener("mousemove", drawing);
+            canvas.removeEventListener("click", detectarFiguraSeleccionada);
+            turnRight();
+
         } else {
             canvas.removeEventListener("mousemove", drawing);
             canvas.removeEventListener("click", detectarFiguraSeleccionada);
@@ -291,9 +303,18 @@ const selectSize = document.getElementById('stroke');
 selectSize.addEventListener('change', function() {
     stroke = parseInt(selectSize.value);
 });
+// Obtener lados poligono
+const sides = document.getElementById('sides');
 
+// Escuchar cambios
+sides.addEventListener('change', function() {
+    numSides = parseInt(sides.value);
+});
 document.addEventListener('DOMContentLoaded', function() {
     stroke = parseInt(selectSize.value);
+});
+document.addEventListener('DOMContentLoaded', function() {
+    numSides = parseInt(sides.value);
 });
 
 function detectarFiguraSeleccionada(event) {
@@ -794,4 +815,126 @@ function registerUndoState() {
     undoStack.push([...formasDibujadas]); // Agregar el estado actual al historial de deshacer
     // Limpiar la pila de redoStack
     redoStack = [];
+}
+
+//girar 90grados a la izquierda
+function turnleft() {
+    // Calcular el centro de la figura
+    if (figuraSeleccionada.tipo === "linea") {
+        let centerX = 0;
+        let centerY = 0;
+
+        centerX += (figuraSeleccionada.startX + figuraSeleccionada.endX) / 2;
+        centerY += (figuraSeleccionada.startY + figuraSeleccionada.endY) / 2;
+
+        // Calcular las coordenadas relativas al centro de la figura
+        let relativeStartX = figuraSeleccionada.startX - centerX;
+        let relativeStartY = figuraSeleccionada.startY - centerY;
+        let relativeEndX = figuraSeleccionada.endX - centerX;
+        let relativeEndY = figuraSeleccionada.endY - centerY;
+
+        // Aplicar la rotación
+        let rotatedStartX = centerX - relativeStartY;
+        let rotatedStartY = centerY + relativeStartX;
+        let rotatedEndX = centerX - relativeEndY;
+        let rotatedEndY = centerY + relativeEndX;
+
+        // Actualizar las coordenadas de la línea
+        figuraSeleccionada.startX = rotatedStartX;
+        figuraSeleccionada.startY = rotatedStartY;
+        figuraSeleccionada.endX = rotatedEndX;
+        figuraSeleccionada.endY = rotatedEndY;
+
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+
+    } else if (figuraSeleccionada.tipo === "poligono") {
+        figuraSeleccionada.initialAngle += (90 * Math.PI / 180); // Sumar 90 grados en radianes
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+    } else if (figuraSeleccionada.tipo === "elipse") {
+        var temp = figuraSeleccionada.a;
+        figuraSeleccionada.a = figuraSeleccionada.b;
+        figuraSeleccionada.b = temp;
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+    } else if (figuraSeleccionada.tipo === "rectangulo") {
+        var newWidth = figuraSeleccionada.height;
+        var newHeight = figuraSeleccionada.width;
+
+        var centerX = figuraSeleccionada.startX + figuraSeleccionada.width / 2;
+        var centerY = figuraSeleccionada.startY + figuraSeleccionada.height / 2;
+
+        // Aplicar la rotación y el desplazamiento
+        figuraSeleccionada.width = newWidth;
+        figuraSeleccionada.height = newHeight;
+        figuraSeleccionada.startX = centerX - figuraSeleccionada.width / 2;
+        figuraSeleccionada.startY = centerY - figuraSeleccionada.height / 2;
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+    }
+
+    // Limpiar el lienzo
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibujar todas las líneas almacenadas con la rotación aplicada
+    formasDibujadas.forEach(function(forma) {
+        drawAll(forma);
+    });
+}
+
+//girar 90grados a la izquierda
+function turnRight() {
+    // Calcular el centro de la figura
+    if (figuraSeleccionada.tipo === "linea") {
+        let centerX = 0;
+        let centerY = 0;
+
+        centerX += (figuraSeleccionada.startX + figuraSeleccionada.endX) / 2;
+        centerY += (figuraSeleccionada.startY + figuraSeleccionada.endY) / 2;
+
+        // Calcular las coordenadas relativas al centro de la figura
+        let relativeStartX = figuraSeleccionada.startX - centerX;
+        let relativeStartY = figuraSeleccionada.startY - centerY;
+        let relativeEndX = figuraSeleccionada.endX - centerX;
+        let relativeEndY = figuraSeleccionada.endY - centerY;
+
+        // Aplicar la rotación
+        let rotatedStartX = centerX + relativeStartY;
+        let rotatedStartY = centerY - relativeStartX;
+        let rotatedEndX = centerX + relativeEndY;
+        let rotatedEndY = centerY - relativeEndX;
+
+        // Actualizar las coordenadas de la línea
+        figuraSeleccionada.startX = rotatedStartX;
+        figuraSeleccionada.startY = rotatedStartY;
+        figuraSeleccionada.endX = rotatedEndX;
+        figuraSeleccionada.endY = rotatedEndY;
+
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+    } else if (figuraSeleccionada.tipo === "poligono") {
+        figuraSeleccionada.initialAngle -= (90 * Math.PI / 180); // Sumar 90 grados en radianes
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+    } else if (figuraSeleccionada.tipo === "elipse") {
+        var temp = figuraSeleccionada.a;
+        figuraSeleccionada.a = figuraSeleccionada.b;
+        figuraSeleccionada.b = temp;
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+    } else if (figuraSeleccionada.tipo === "rectangulo") {
+        var newWidth = figuraSeleccionada.height;
+        var newHeight = figuraSeleccionada.width;
+
+        var dx = (newWidth - figuraSeleccionada.width) / 2;
+        var dy = (newHeight - figuraSeleccionada.height) / 2;
+
+        figuraSeleccionada.width = newWidth;
+        figuraSeleccionada.height = newHeight;
+        figuraSeleccionada.startX -= dx;
+        figuraSeleccionada.startY -= dy;
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+    }
+
+    // Limpiar el lienzo
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibujar todas las líneas almacenadas con la rotación aplicada
+    formasDibujadas.forEach(function(forma) {
+        drawAll(forma);
+    });
 }

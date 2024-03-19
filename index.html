@@ -85,6 +85,8 @@
             </div>
             <div class="image tool">
                 <img src="./icons/escala.png" class="icon escala" data-value="escala">
+                <img src="./icons/izquierda.png" class="icon izquiera" data-value="girarIz">
+                <img src="./icons/derecha.png" class="icon derecha" data-value="girarDe">
                 <br> Imagen
             </div>
             <div class="tools tool">
@@ -105,10 +107,12 @@
                     <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
                     <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
                     <img src="./icons/trapecio.png" class="icon trapecio" data-value="trapecio">
+
                 </div>
                 <br> Formas
             </div>
             <div class="size tool">
+                <input type="number" id="sides" name="sides" value="3" min="0" max="100" step="1">
                 <select id="stroke" value="1">
                     <option value="1">1px</option>
                     <option value="2">2px</option>
