@@ -6,14 +6,19 @@
     <meta name="viewport" content="width=device-width">
     <title>Paint PRO</title>
     <style>
+        .tool-bar {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+        }
+        
         .file-tools {
-            margin: 0;
-            width: 96%;
+            grid-column: 1 / 2;
             position: absolute;
             display: flex;
         }
         
-        .toolbar {
+        .canvas-tools {
+            grid-column: 2 / 3;
             background-color: rgb(199, 198, 198);
             margin: 0;
             padding-top: 1%;
@@ -64,65 +69,75 @@
             <div class="save tool">
                 <img src="./icons/disquete.png" class="icon guardarPNG" data-value="png">
             </div>
-
-        </div>
-        <div class="selection tool">
-            <img src="./icons/cursor.png" class="icon selection" data-value="seleccion">
-
-            <br> Selección
-        </div>
-        <div class="image tool">
-            <img src="./icons/escala.png" class="icon escala" data-value="escala">
-            <br> Imagen
-        </div>
-        <div class="tools tool">
-            <img src="./icons/lapiz (1).png" class="icon lapiz" data-value="lapiz">
-            <img src="./icons/borrador.png" class="icon borrar" data-value="borrar">
-            <br> Herramientas
-        </div>
-        <!-- <div class="pen tool">
-            <br> Pinceles
-        </div>-->
-        <div class="shapes tool">
-            <div class="grid-container">
-                <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
-                <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
-                <img src="./icons/rectangulo-panoramico.png" class="icon rect" data-value="rectangulo">
-                <img src="./icons/circulo.png" class="icon circle" data-value="circulo">
-                <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon ellipse" data-value="elipse">
-                <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
-                <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
-                <img src="./icons/trapecio.png" class="icon trapecio" data-value="trapecio">
+            <div class="undo tool">
+                <img src="./icons/deshacer.png" id="undo" class="icon undo" data-value="undo">
             </div>
-            <br> Formas
-        </div>
-        <div class="size tool">
-            <select id="stroke" value="1">
-                <option value="1">1px</option>
-                <option value="2">2px</option>
-                <option value="4">4px</option>
-                <option value="6">6px</option>
-                <option value="8">8px</option>
-                <option value="10">10px</option>
-              </select>
-            <br> Tamaño
-        </div>
-        <div class="colors tool">
-            <input type="color" value="#000000" id="colorPicker" name="colorPicker">
-            <br> Colores
-        </div>
-        <div class="layers tool">
-            <div class="layers grid-container">
-                <img src="./icons/moverAtras.png" class="icon moverAtras" data-value="moverAtras">
-                <img src="./icons/moverAdelante.png" class="icon moverAdelante" data-value="moverAdelante">
-                <img src="./icons/moverFondo.png" class="icon moverAlFondo" data-value="moverAlFondo">
-                <img src="./icons/moverEnfrente.png" class="icon moverEnfrente" data-value="moverEnfrente">
-
+            <div class="redo tool">
+                <img src="./icons/rehacer.png" id="redo" class="icon redo" data-value="redo">
             </div>
 
-            <br> Capas
         </div>
+        <div class="canvas-tools">
+            <div class="selection tool">
+                <img src="./icons/cursor.png" class="icon selection" data-value="seleccion">
+
+                <br> Selección
+            </div>
+            <div class="image tool">
+                <img src="./icons/escala.png" class="icon escala" data-value="escala">
+                <br> Imagen
+            </div>
+            <div class="tools tool">
+                <img src="./icons/lapiz (1).png" class="icon lapiz" data-value="lapiz">
+                <img src="./icons/borrador.png" class="icon borrar" data-value="borrar">
+                <br> Herramientas
+            </div>
+            <!-- <div class="pen tool">
+                <br> Pinceles
+            </div>-->
+            <div class="shapes tool">
+                <div class="grid-container">
+                    <img src="./icons/barra-oblicua.png" class="icon line" data-value="linea">
+                    <img src="./icons/cuadrado.png" class="icon square" data-value="cuadrado">
+                    <img src="./icons/rectangulo-panoramico.png" class="icon rect" data-value="rectangulo">
+                    <img src="./icons/circulo.png" class="icon circle" data-value="circulo">
+                    <img src="./icons/variante-de-forma-de-contorno-de-elipse.png" class="icon ellipse" data-value="elipse">
+                    <img src="./icons/hexagono.png" class="icon polygon" data-value="poligono">
+                    <img src="./icons/rombo.png" class="icon rombo" data-value="rombo">
+                    <img src="./icons/trapecio.png" class="icon trapecio" data-value="trapecio">
+                </div>
+                <br> Formas
+            </div>
+            <div class="size tool">
+                <select id="stroke" value="1">
+                    <option value="1">1px</option>
+                    <option value="2">2px</option>
+                    <option value="4">4px</option>
+                    <option value="6">6px</option>
+                    <option value="8">8px</option>
+                    <option value="10">10px</option>
+                  </select>
+                <br> Tamaño
+            </div>
+            <div class="colors tool">
+                <input type="color" value="#000000" id="colorPicker" name="colorPicker">
+                <br> Colores
+            </div>
+            <div class="layers tool">
+                <div class="layers grid-container">
+                    <img src="./icons/moverAtras.png" class="icon moverAtras" data-value="moverAtras">
+                    <img src="./icons/moverAdelante.png" class="icon moverAdelante" data-value="moverAdelante">
+                    <img src="./icons/moverFondo.png" class="icon moverAlFondo" data-value="moverAlFondo">
+                    <img src="./icons/moverEnfrente.png" class="icon moverEnfrente" data-value="moverEnfrente">
+
+                </div>
+
+                <br> Capas
+            </div>
+        </div>
+
     </div>
+
     <canvas id="canvas" width="1500" height="563" style="border:1px solid black;"></canvas>
     <script type="module" src="objeto.js"></script>
     <script>
