@@ -17,7 +17,7 @@ var formasDibujadas = [];
 let drawingPoints = [];
 
 // Manejar eventos de dibujo (mousedown, mousemove, mouseup)
-var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle, selectedColor, stroke, initial;
+var startX, startY, figura, mouseX, mouseY, radiusP, initialAngle, selectedColor, stroke;
 var isDrawing = false;
 var numSides = 0;
 initialAngle = 0;
@@ -26,9 +26,10 @@ let figuraSeleccionada = null;
 let indiceFiguraSeleccionada = -1;
 let undoStack = [];
 let redoStack = [];
-initial = 0;
+
 
 canvas.addEventListener("mousedown", function(event) {
+    initialAngle = 0;
     var rect = canvas.getBoundingClientRect();
     if (figuraSeleccionada !== null && figura == "escala") {
         startX = Math.round(event.clientX - rect.left);
@@ -38,13 +39,15 @@ canvas.addEventListener("mousedown", function(event) {
         figura = "mover";
         canvas.addEventListener("mousemove", moverFigura);
         canvas.style.cursor = "move";
+    } else if (figuraSeleccionada !== null && figura === "girar" && figuraSeleccionada.tipo !== "lapiz") {
+        canvas.addEventListener("mousemove", rotate);
     } else {
         if (figura === "poligono") {
             startX = event.offsetX;
             startY = event.offsetY;
             mouseX = startX;
             mouseY = startY;
-            initialAngle = 0;
+
         } else if (figura === "lapiz") {
             drawingPoints = []; // Limpiar los puntos dibujados
 
@@ -97,7 +100,7 @@ function drawing(event) {
         } else if (figura === "circulo") {
             drawCircleBresenham(ctx, startX, startY, Math.round(Math.sqrt((x - startX) ** 2 + (y - startY) ** 2)), stroke);
         } else if (figura === "rectangulo") {
-            drawRectangle(ctx, startX, startY, x - startX, y - startY, stroke);
+            drawRectangle(ctx, startX, startY, x - startX, y - startY, stroke, initialAngle);
         } else if (figura === "elipse") {
             drawEllipse(ctx, startX, startY, Math.abs(x - startX), Math.abs(y - startY), stroke);
         } else if (figura === "poligono") {
@@ -132,16 +135,29 @@ canvas.addEventListener("mouseup", function(event) {
         canvas.removeEventListener("mousemove", resize);
         canvas.removeEventListener("mousemove", moverFigura);
         canvas.removeEventListener("mousemove", drawing);
+        canvas.removeEventListener("mousemove", rotate);
         // Actualizar la figura redimensionada en el arreglo
         registerUndoState();
         formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
         figuraSeleccionada = null;
         indiceFiguraSeleccionada = -1;
         canvas.removeEventListener("click", detectarFiguraSeleccionada);
-    } else if (figuraSeleccionada !== null && figura === "mover" && figura !== "borrar") {
+    } else if (figuraSeleccionada !== null && figura === "girar") {
+        canvas.removeEventListener("mousemove", resize);
+        canvas.removeEventListener("mousemove", moverFigura);
+        canvas.removeEventListener("mousemove", drawing);
+        canvas.removeEventListener("mousemove", rotate);
+        // Actualizar la figura redimensionada en el arreglo
+        registerUndoState();
+        formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
+        figuraSeleccionada = null;
+        indiceFiguraSeleccionada = -1;
+        canvas.removeEventListener("click", detectarFiguraSeleccionada);
+    } else if (figuraSeleccionada !== null && figura === "mover") {
         canvas.removeEventListener("mousemove", moverFigura);
         canvas.removeEventListener("mousemove", resize);
         canvas.removeEventListener("mousemove", drawing);
+        canvas.removeEventListener("mousemove", rotate);
         registerUndoState();
         formasDibujadas[indiceFiguraSeleccionada] = figuraSeleccionada;
         figuraSeleccionada = null;
@@ -149,7 +165,7 @@ canvas.addEventListener("mouseup", function(event) {
         canvas.style.cursor = "default";
         canvas.removeEventListener("click", detectarFiguraSeleccionada);
     } else {
-        if (figura === "seleccion" || figura === "mover" || figura === "escala" || figura === "borrar" || figura === "moverAtras") return;
+        if (figura === "seleccion" || figura === "mover" || figura === "escala" || figura === "borrar" || figura === "moverAtras" || figura === "girar") return;
 
         var rect = canvas.getBoundingClientRect();
 
@@ -199,6 +215,7 @@ canvas.addEventListener("mouseup", function(event) {
         canvas.removeEventListener("mousemove", drawing);
         canvas.removeEventListener("mousemove", moverFigura);
         canvas.removeEventListener("mousemove", resize);
+        canvas.removeEventListener("mousemove", rotate);
     }
 });
 
@@ -212,7 +229,7 @@ function drawAll(forma) {
     } else if (forma.tipo === "circulo") {
         drawCircleBresenham(ctx, forma.startX, forma.startY, forma.radius, forma.stroke);
     } else if (forma.tipo === "rectangulo") {
-        drawRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke);
+        drawRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke, forma.initialAngle);
     } else if (forma.tipo === "elipse") {
         drawEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b, forma.stroke);
     } else if (forma.tipo === "poligono") {
@@ -327,7 +344,7 @@ function detectarFiguraSeleccionada(event) {
     for (var i = formasDibujadas.length - 1; i >= 0; i--) {
         var forma = formasDibujadas[i];
         if (forma.tipo === "linea") {
-            if (selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
+            if (selectedLineBresenham(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y, forma.initialAngle)) {
                 console.log("Linea seleccionada");
 
                 //drawAll(forma);
@@ -341,7 +358,7 @@ function detectarFiguraSeleccionada(event) {
 
         } else if (forma.tipo === "cuadrado") {
 
-            if (selectedSquare(ctx, forma.startX, forma.startY, forma.size, forma.stroke, x, y)) {
+            if (selectedSquare(ctx, forma.startX, forma.startY, forma.size, forma.stroke, x, y, forma.initialAngle)) {
                 console.log("Cuadrado seleccionada");
 
                 //drawAll(forma);
@@ -369,7 +386,7 @@ function detectarFiguraSeleccionada(event) {
 
         } else if (forma.tipo === "rectangulo") {
 
-            if (selectedRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke, x, y)) {
+            if (selectedRectangle(ctx, forma.startX, forma.startY, forma.width, forma.height, forma.stroke, x, y, forma.initialAngle)) {
                 console.log("Rectangulo seleccionada");
 
                 //drawAll(forma);
@@ -383,7 +400,7 @@ function detectarFiguraSeleccionada(event) {
 
         } else if (forma.tipo === "elipse") {
 
-            if (selectedEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b, forma.stroke, x, y)) {
+            if (selectedEllipse(ctx, forma.startX, forma.startY, forma.a, forma.b, forma.stroke, x, y, forma.initialAngle)) {
                 console.log("Elipse seleccionada");
 
                 //drawAll(forma);
@@ -435,7 +452,7 @@ function detectarFiguraSeleccionada(event) {
 
         } else if (forma.tipo === "rombo") {
 
-            if (selectedRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
+            if (selectedRhombus(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y, forma.initialAngle)) {
                 console.log("Rombo seleccionada");
 
                 //drawAll(forma);
@@ -449,7 +466,7 @@ function detectarFiguraSeleccionada(event) {
 
         } else if (forma.tipo === "trapecio") {
 
-            if (selectedTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y)) {
+            if (selectedTrapezoid(ctx, forma.startX, forma.startY, forma.endX, forma.endY, forma.stroke, x, y, forma.initialAngle)) {
                 console.log("Trapecio seleccionada");
                 //drawAll(forma);
                 figuraSeleccionada = JSON.parse(JSON.stringify(forma));;
@@ -508,36 +525,23 @@ function moverFigura(event) {
         });
 
         // Dibujar la figura seleccionada en su nueva posición
-        setColor(ctx, '#ff0000');
+        //setColor(ctx, '#ff0000');
         if (figuraSeleccionada.tipo === "linea") {
-            drawLineBresenham(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke);
+            drawLineBresenham(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         } else if (figuraSeleccionada.tipo === "cuadrado") {
-            drawSquare(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.size, figuraSeleccionada.stroke);
+            drawSquare(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.size, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         } else if (figuraSeleccionada.tipo === "circulo") {
-            drawCircleBresenham(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.radius, figuraSeleccionada.stroke);
+            drawCircleBresenham(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.radius, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         } else if (figuraSeleccionada.tipo === "rectangulo") {
-            drawRectangle(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.width, figuraSeleccionada.height, figuraSeleccionada.stroke);
+            drawRectangle(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.width, figuraSeleccionada.height, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         } else if (figuraSeleccionada.tipo === "elipse") {
-            drawEllipse(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.a, figuraSeleccionada.b, figuraSeleccionada.stroke);
+            drawEllipse(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.a, figuraSeleccionada.b, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         } else if (figuraSeleccionada.tipo === "poligono") {
             drawPolygon(ctx, figuraSeleccionada.numSides, figuraSeleccionada.radiusP, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.initialAngle, figuraSeleccionada.stroke);
-            //} else if (figuraSeleccionada.tipo === "lapiz") {
-            //    for (let i = 0; i < drawingPoints.length; i++) {
-            //        figuraSeleccionada.points[i].x += diffX;
-            //        figuraSeleccionada.points[i].y += diffY;
-            //    }
-            //    for (let i = 1; i < figuraSeleccionada.points.length; i++) {
-
-            //        const startPoint = figuraSeleccionada.points[i - 1];
-            //        const endPoint = figuraSeleccionada.points[i];
-
-            //        drawLineBresenham(ctx, startPoint.x, startPoint.y, endPoint.x, endPoint.y, figuraSeleccionada.stroke);
-
-            //    }
         } else if (figuraSeleccionada.tipo === "rombo") {
-            drawRhombus(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke);
+            drawRhombus(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         } else if (figuraSeleccionada.tipo === "trapecio") {
-            drawTrapezoid(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke);
+            drawTrapezoid(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         }
 
 
@@ -720,7 +724,7 @@ function resize(event) {
         } else if (figuraSeleccionada.tipo === "rectangulo") {
             figuraSeleccionada.width += diffX;
             figuraSeleccionada.height += diffY;
-            drawRectangle(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.width, figuraSeleccionada.height, figuraSeleccionada.stroke);
+            drawRectangle(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.width, figuraSeleccionada.height, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
         } else if (figuraSeleccionada.tipo === "circulo") {
             var radius = Math.round(Math.sqrt((x - figuraSeleccionada.startX) ** 2 + (y - figuraSeleccionada.startY) ** 2));
             figuraSeleccionada.radius = radius;
@@ -733,7 +737,6 @@ function resize(event) {
             figuraSeleccionada.radiusP = Math.sqrt(diffX ** 2 + diffY ** 2);
             // Calcular el nuevo radioP y el nuevo ángulo inicial
             figuraSeleccionada.radiusP = Math.sqrt(Math.pow(x - figuraSeleccionada.startX, 2) + Math.pow(y - figuraSeleccionada.startY, 2));
-            figuraSeleccionada.initialAngle = Math.atan2(y - figuraSeleccionada.startY, x - figuraSeleccionada.startX);
             drawPolygon(ctx, figuraSeleccionada.numSides, figuraSeleccionada.radiusP, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.initialAngle, figuraSeleccionada.stroke);
         } else if (figuraSeleccionada.tipo === "rombo") {
             figuraSeleccionada.endX += diffX;
@@ -937,4 +940,71 @@ function turnRight() {
     formasDibujadas.forEach(function(forma) {
         drawAll(forma);
     });
+}
+
+function rotate(event) {
+    mouseX = event.offsetX;
+    mouseY = event.offsetY;
+    figuraSeleccionada.initialAngle = Math.atan2(mouseY - figuraSeleccionada.startY, mouseX - figuraSeleccionada.startX);
+    if (figuraSeleccionada.tipo !== "poligono") {
+        var x, y;
+        var rect = canvas.getBoundingClientRect();
+        x = Math.round(event.clientX - rect.left);
+        y = Math.round(event.clientY - rect.top);
+        figuraSeleccionada.initialAngle = Math.atan2(y - figuraSeleccionada.startY, x - figuraSeleccionada.startX);
+    } else {
+        mouseX = event.offsetX;
+        mouseY = event.offsetY;
+        figuraSeleccionada.initialAngle = Math.atan2(mouseY - figuraSeleccionada.startY, mouseX - figuraSeleccionada.startX);
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    formasDibujadas.forEach(function(forma, index) {
+        //Dibujar todas las figuras excepto la figura seleccionada
+        if (index !== indiceFiguraSeleccionada) {
+            drawAll(forma);
+        }
+    });
+    if (figuraSeleccionada.tipo === "linea") {
+        //figuraSeleccionada.initialAngle *= 0.06;
+        // Calcular el punto medio de la línea original
+        var midPoint = calculateMidpoint(figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY);
+
+        // Rotar el punto medio alrededor de sí mismo para mantener el centro
+        var rotatedMidpoint = rotatePoint(midPoint.x, midPoint.y, midPoint.x, midPoint.y, figuraSeleccionada.initialAngle);
+
+        // Calcular los puntos de inicio y fin de la línea rotada usando el punto medio rotado como referencia
+        var rotatedStart = rotatePoint(figuraSeleccionada.startX, figuraSeleccionada.startY, rotatedMidpoint.x, rotatedMidpoint.y, figuraSeleccionada.initialAngle);
+        var rotatedEnd = rotatePoint(figuraSeleccionada.endX, figuraSeleccionada.endY, rotatedMidpoint.x, rotatedMidpoint.y, figuraSeleccionada.initialAngle);
+        figuraSeleccionada.startX = Math.round(rotatedStart.x);
+        figuraSeleccionada.startY = Math.round(rotatedStart.y);
+        figuraSeleccionada.endX = Math.round(rotatedEnd.x);
+        figuraSeleccionada.endY = Math.round(rotatedEnd.y);
+        drawLineBresenham(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke);
+    } else if (figuraSeleccionada.tipo === "cuadrado") {
+        drawSquare(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.size, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
+    } else if (figuraSeleccionada.tipo === "rectangulo") { //este ya
+        drawRectangle(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.width, figuraSeleccionada.height, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
+    } else if (figuraSeleccionada.tipo === "elipse") {
+        drawEllipse(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.a, figuraSeleccionada.b, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
+    } else if (figuraSeleccionada.tipo === "poligono") { //este ya
+        drawPolygon(ctx, figuraSeleccionada.numSides, figuraSeleccionada.radiusP, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.initialAngle, figuraSeleccionada.stroke);
+    } else if (figuraSeleccionada.tipo === "rombo") {
+        drawRhombus(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
+    } else if (figuraSeleccionada.tipo === "trapecio") {
+        drawTrapezoid(ctx, figuraSeleccionada.startX, figuraSeleccionada.startY, figuraSeleccionada.endX, figuraSeleccionada.endY, figuraSeleccionada.stroke, figuraSeleccionada.initialAngle);
+    }
+
+}
+
+function rotatePoint(x, y, x1, y1, angle) {
+    var newX = (x - x1) * Math.cos(angle) - (y - y1) * Math.sin(angle) + x1;
+    var newY = (x - x1) * Math.sin(angle) + (y - y1) * Math.cos(angle) + y1;
+    return { x: newX, y: newY };
+}
+
+function calculateMidpoint(x0, y0, x1, y1) {
+    var midX = (x0 + x1) / 2;
+    var midY = (y0 + y1) / 2;
+    return { x: midX, y: midY };
 }

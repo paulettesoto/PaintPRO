@@ -50,6 +50,12 @@
             grid-template-columns: repeat(2, 1fr);
             grid-gap: 10px;
         }
+        
+        .image.grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 10px;
+        }
     </style>
 </head>
 
@@ -84,9 +90,12 @@
                 <br> Selección
             </div>
             <div class="image tool">
-                <img src="./icons/escala.png" class="icon escala" data-value="escala">
-                <img src="./icons/izquierda.png" class="icon izquiera" data-value="girarIz">
-                <img src="./icons/derecha.png" class="icon derecha" data-value="girarDe">
+                <div class="image grid-container">
+                    <img src="./icons/escala.png" class="icon escala" data-value="escala">
+                    <img src="./icons/girar.png" class="icon girar" data-value="girar">
+                    <img src="./icons/izquierda.png" class="icon izquiera" data-value="girarIz">
+                    <img src="./icons/derecha.png" class="icon derecha" data-value="girarDe">
+                </div>
                 <br> Imagen
             </div>
             <div class="tools tool">

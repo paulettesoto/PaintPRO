@@ -4,7 +4,6 @@ import { drawLineBresenham, selectedLineBresenham } from './lineaBresenham.js';
 export function drawPolygon(ctx, numSides, radius, centerX, centerY, initialAngle, stroke) {
     var angle = (2 * Math.PI) / numSides; // Ángulo central de cada vértice
     var lastX, lastY;
-
     for (var i = 0; i < numSides; i++) {
         var x = Math.round(centerX + radius * Math.cos(angle * i + initialAngle));
         var y = Math.round(centerY + radius * Math.sin(angle * i + initialAngle));

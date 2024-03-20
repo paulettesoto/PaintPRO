@@ -21,6 +21,7 @@ export function drawLineBresenham(ctx, x0, y0, x1, y1, stroke) {
         }
     }
 }
+// Función para dibujar la línea con el algoritmo Bresenham
 
 export function selectedLineBresenham(ctx, x0, y0, x1, y1, stroke, px, py) {
     const dx = Math.abs(x1 - x0);
