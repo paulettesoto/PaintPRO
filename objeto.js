@@ -574,13 +574,10 @@ function downloadPNG() {
     document.body.removeChild(downloadPNG);
 
     //guardar PDF
-    //const pdf = new jsPDF();
+    const pdf = new jsPDF();
+    pdf.addImage(imgData, 'PNG', 0, 0);
+    pdf.save("mi-canvas.pdf");
 
-    // Agregar la imagen al PDF
-    //pdf.addImage(imgData, 'PNG', 10, 10, 180, 130); // (imagen, formato, x, y, ancho, alto)
-
-    // Guardar el PDF
-    //pdf.save('mi_documento.pdf');
 }
 
 
