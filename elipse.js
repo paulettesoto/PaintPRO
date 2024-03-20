@@ -1,124 +1,50 @@
-import { drawPixel, selectedLineBresenham } from './lineaBresenham.js';
-// Función para dibujar los puntos simétricos de la elipse en un octante
-function drawEllipsePoints(ctx, xc, yc, x, y, stroke) {
-    // Dibujar los puntos simétricos en el octante
-    drawPixel(ctx, xc + x, yc + y, stroke);
-    drawPixel(ctx, xc - x, yc + y, stroke);
-    drawPixel(ctx, xc + x, yc - y, stroke);
-    drawPixel(ctx, xc - x, yc - y, stroke);
-}
+import { drawPixel } from './lineaBresenham.js';
+
 
 // Función para dibujar una elipse a partir de su centro y semiejes (a y b)
-export function drawEllipse(ctx, xc, yc, a, b, stroke) {
-    let x = 0;
-    let y = b;
-    let a2 = a * a;
-    let b2 = b * b;
-    let d = Math.round(b2 - a2 * b + 0.25 * a2);
-    let dx = 2 * b2 * x;
-    let dy = 2 * a2 * y;
+export function drawEllipse(ctx, xc, yc, a, b, stroke, angle = 0) {
+    let cosAngle = Math.cos(angle);
+    let sinAngle = Math.sin(angle);
+    const points = 3240; // Aumentamos el número de puntos a generar
 
-    while (dx < dy) {
-        drawEllipsePoints(ctx, xc, yc, x, y, stroke);
+    for (let i = 0; i <= points; i++) {
+        let angle = (i * Math.PI * 2) / points;
+        let x = Math.round(a * Math.cos(angle));
+        let y = Math.round(b * Math.sin(angle));
 
-        x++;
-        dx += 2 * b2;
-        if (d < 0) {
-            d += b2 * (2 * x + 3);
-        } else {
-            y--;
-            dy -= 2 * a2;
-            d += b2 * (2 * x + 3) + a2 * (-2 * y + 2);
-        }
-    }
+        // Rotar y trasladar los puntos de la elipse
+        let xRotated = Math.round(x * cosAngle - y * sinAngle) + xc;
+        let yRotated = Math.round(x * sinAngle + y * cosAngle) + yc;
 
-    d = Math.round(b2 * (x + 0.5) * (x + 0.5) + a2 * (y - 1) * (y - 1) - a2 * b2);
-    while (y >= 0) {
-        drawEllipsePoints(ctx, xc, yc, x, y, stroke);
-
-        y--;
-        dy -= 2 * a2;
-        if (d > 0) {
-            d += a2 * (-2 * y + 3);
-        } else {
-            x++;
-            dx += 2 * b2;
-            d += b2 * (2 * x + 2) + a2 * (-2 * y + 3);
-        }
-    }
-}
-
-function selectedEllipsePoints(ctx, xc, yc, x, y, stroke, px, py) {
-
-    var x1 = xc + x;
-    var y1 = yc + y;
-    //selectedLineBresenham(ctx, xc + x, yc + y, stroke)
-    if (x1 >= px - stroke && x1 <= px + stroke && y1 >= py - stroke && y1 <= py + stroke) {
-        return true;
-    }
-    x1 = xc - x;
-    y1 = yc + y;
-    //selectedLineBresenham(ctx, xc - x, yc + y, stroke)
-    if (x1 >= px - stroke && x1 <= px + stroke && y1 >= py - stroke && y1 <= py + stroke) {
-        return true;
-    }
-    x1 = xc + x;
-    y1 = yc - y;
-    //selectedLineBresenham(ctx, xc + x, yc - y, stroke)
-    if (x1 >= px - stroke && x1 <= px + stroke && y1 >= py - stroke && y1 <= py + stroke) {
-        return true;
-    }
-    x1 = xc - x;
-    y1 = yc - y;
-    //selectedLineBresenham(ctx, xc - x, yc - y, stroke)
-    if (x1 >= px - stroke && x1 <= px + stroke && y1 >= py - stroke && y1 <= py + stroke) {
-        return true;
+        drawPixel(ctx, xRotated, yRotated, stroke);
     }
 
 }
+export function selectedEllipse(ctx, xc, yc, a, b, stroke, px, py, angle = 0) {
+    let cosAngle = Math.cos(angle);
+    let sinAngle = Math.sin(angle);
+    const points = 720; // Aumentamos el número de puntos a generar
 
-// Función para dibujar una elipse a partir de su centro y semiejes (a y b)
-export function selectedEllipse(ctx, xc, yc, a, b, stroke, px, py) {
-    let x = 0;
-    let y = b;
-    let a2 = a * a;
-    let b2 = b * b;
-    let d = Math.round(b2 - a2 * b + 0.25 * a2);
-    let dx = 2 * b2 * x;
-    let dy = 2 * a2 * y;
+    for (let i = 0; i <= points; i++) {
+        let angle = (i * Math.PI * 2) / points;
+        let x = Math.round(a * Math.cos(angle));
+        let y = Math.round(b * Math.sin(angle));
 
-    while (dx < dy) {
-        if (selectedEllipsePoints(ctx, xc, yc, x, y, stroke, px, py)) {
-            //console.log("Elipse seleccionado");
+        // Rotar y trasladar los puntos de la elipse
+        let xRotated = Math.round(x * cosAngle - y * sinAngle) + xc;
+        let yRotated = Math.round(x * sinAngle + y * cosAngle) + yc;
+
+        if (verify(xRotated, yRotated, px, py, stroke)) {
             return true;
-        }
-
-        x++;
-        dx += 2 * b2;
-        if (d < 0) {
-            d += b2 * (2 * x + 3);
-        } else {
-            y--;
-            dy -= 2 * a2;
-            d += b2 * (2 * x + 3) + a2 * (-2 * y + 2);
         }
     }
 
-    d = Math.round(b2 * (x + 0.5) * (x + 0.5) + a2 * (y - 1) * (y - 1) - a2 * b2);
-    while (y >= 0) {
-        if (selectedEllipsePoints(ctx, xc, yc, x, y, stroke, px, py)) {
-            //console.log("Elipse seleccionado");
-            return true;
-        }
+    return false;
+}
 
-        y--;
-        dy -= 2 * a2;
-        if (d > 0) {
-            d += a2 * (-2 * y + 3);
-        } else {
-            x++;
-            dx += 2 * b2;
-            d += b2 * (2 * x + 2) + a2 * (-2 * y + 3);
-        }
+
+function verify(x1, y1, x, y, s) {
+    if (x1 >= x - s + 1 && x1 <= x + s + 1 && y1 >= y - s + 1 && y1 <= y + s + 1) {
+        return true;
     }
 }

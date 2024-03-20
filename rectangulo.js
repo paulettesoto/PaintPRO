@@ -24,7 +24,7 @@ export function drawRectangle(ctx, x, y, width, height, stroke, angle) {
         const rotated_point4 = rotatePoint(x4, y4, center_x, center_y, angle);
 
         // Dibujar líneas del rectángulo rotado
-        console.log(rotated_point1, rotated_point2, rotated_point3, rotated_point4);
+        //console.log(rotated_point1, rotated_point2, rotated_point3, rotated_point4);
         drawLineBresenham(ctx, Math.round(rotated_point1.x), Math.round(rotated_point1.y), Math.round(rotated_point2.x), Math.round(rotated_point2.y), stroke);
         drawLineBresenham(ctx, Math.round(rotated_point2.x), Math.round(rotated_point2.y), Math.round(rotated_point3.x), Math.round(rotated_point3.y), stroke);
         drawLineBresenham(ctx, Math.round(rotated_point3.x), Math.round(rotated_point3.y), Math.round(rotated_point4.x), Math.round(rotated_point4.y), stroke);
