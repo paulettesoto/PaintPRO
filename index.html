@@ -6,20 +6,22 @@
     <meta name="viewport" content="width=device-width">
     <title>Paint PRO</title>
     <style>
-        .tool-bar {
+        .toolbar {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
+            background-color: #B1CFD6;
+            border-radius: 10px;
         }
         
         .file-tools {
             grid-column: 1 / 2;
             position: absolute;
             display: flex;
+            margin: 0.5% 1%;
         }
         
         .canvas-tools {
             grid-column: 2 / 3;
-            background-color: rgb(199, 198, 198);
             margin: 0;
             padding-top: 1%;
             width: 100%;
@@ -55,6 +57,12 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-gap: 10px;
+        }
+        
+        .canv {
+            display: grid;
+            place-items: center;
+            height: 81vh;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
@@ -151,16 +159,18 @@
         </div>
 
     </div>
+    <div class="canv">
+        <canvas id="canvas" width="1000" height="550" style="border:1px solid #8AA6AC;background-color: #FAFAFF;"></canvas>
 
-    <canvas id="canvas" width="1500" height="563" style="border:1px solid black;"></canvas>
+    </div>
     <script type="module" src="objeto.js"></script>
-    <script>
+    <!-- <script>
         function callLine() {
             var script = document.createElement('script');
             script.src = 'trapecio2.js';
             document.head.appendChild(script);
         }
-    </script>
+    </script>-->
 
 
 

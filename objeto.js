@@ -256,6 +256,7 @@ const imagenes = document.querySelectorAll('.icon');
 imagenes.forEach(function(img) {
     img.addEventListener('click', function() {
         // Obtener el valor del atributo data-value de la imagen
+
         figura = this.getAttribute('data-value');
         console.log(figura)
         if (figura === "seleccion") {
